@@ -22,6 +22,7 @@ import {
   MessageCircle
 } from 'lucide-react'
 import Link from 'next/link'
+import DockNavbar from '@/components/DockNavbar'
 
 interface Profile {
   id: string
@@ -53,6 +54,11 @@ export default function DashboardPage() {
   const [referralCommissions, setReferralCommissions] = useState(0)
   const [plans, setPlans] = useState<InvestmentPlan[]>([])
   const [loadingData, setLoadingData] = useState(true)
+  const [showJrcModal, setShowJrcModal] = useState(false)
+  const [jrcAmount, setJrcAmount] = useState('')
+  const [jrcPurchasing, setJrcPurchasing] = useState(false)
+  const [jrcError, setJrcError] = useState('')
+  const [jrcSuccess, setJrcSuccess] = useState('')
   const supabase = createSupabaseClient()
 
   useEffect(() => {
@@ -163,6 +169,82 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     await signOut()
     router.push('/')
+  }
+
+  const handleJrcPurchase = async () => {
+    if (!jrcAmount || !profile) return
+
+    setJrcPurchasing(true)
+    setJrcError('')
+    setJrcSuccess('')
+
+    const coinsToBuy = parseFloat(jrcAmount)
+    const jrcRate = 0.1 // $0.1 per JRC coin
+    const totalCost = coinsToBuy * jrcRate
+
+    // Validation
+    if (coinsToBuy <= 0) {
+      setJrcError('Please enter a valid amount of JRC coins to purchase')
+      setJrcPurchasing(false)
+      return
+    }
+
+    if (totalCost > profile.fund_wallet_balance) {
+      setJrcError(`Insufficient fund wallet balance. You need $${totalCost.toFixed(2)} but only have $${profile.fund_wallet_balance.toFixed(2)}`)
+      setJrcPurchasing(false)
+      return
+    }
+
+    try {
+      // Update user balances
+      const newFundBalance = profile.fund_wallet_balance - totalCost
+      const newJrcBalance = profile.total_jarvis_tokens + coinsToBuy
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          fund_wallet_balance: newFundBalance,
+          total_jarvis_tokens: newJrcBalance
+        })
+        .eq('id', user?.id)
+
+      if (updateError) throw updateError
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: user?.id,
+          transaction_type: 'deposit',
+          amount: totalCost,
+          net_amount: totalCost,
+          status: 'completed',
+          description: `Purchased ${coinsToBuy.toLocaleString()} JRC coins at $${jrcRate} per coin`
+        })
+
+      if (transactionError) throw transactionError
+
+      // Update local state
+      setProfile((prev: any) => ({
+        ...prev,
+        fund_wallet_balance: newFundBalance,
+        total_jarvis_tokens: newJrcBalance
+      }))
+
+      setJrcSuccess(`Successfully purchased ${coinsToBuy.toLocaleString()} JRC coins for $${totalCost.toFixed(2)}!`)
+      setJrcAmount('')
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setShowJrcModal(false)
+        setJrcSuccess('')
+      }, 2000)
+
+    } catch (error: any) {
+      setJrcError(error.message || 'Failed to purchase JRC coins')
+    } finally {
+      setJrcPurchasing(false)
+    }
   }
 
   if (loading || loadingData) {
@@ -278,10 +360,13 @@ export default function DashboardPage() {
                 <Coins className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Jarvis Tokens</h3>
-                <p className="text-2xl font-bold text-yellow-400">{profile.total_jarvis_tokens.toLocaleString()} JRV</p>
-                <button className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold mt-2">
-                  BUY JRV
+                <h3 className="text-white font-semibold">Jarvis Coins</h3>
+                <p className="text-2xl font-bold text-yellow-400">{profile.total_jarvis_tokens.toLocaleString()} JRC</p>
+                <button 
+                  onClick={() => setShowJrcModal(true)}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold mt-2 transition-colors"
+                >
+                  BUY JRC
                 </button>
               </div>
             </div>
@@ -297,7 +382,7 @@ export default function DashboardPage() {
 
           <Link href="/dashboard/invest" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
             <TrendingUp className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Invest</p>
+            <p className="text-white font-semibold">Stake USDT</p>
           </Link>
 
           <Link href="/dashboard/transfer" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
@@ -475,31 +560,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-blue-600 border-t border-blue-500">
-        <div className="grid grid-cols-5 text-center">
-          <Link href="/dashboard" className="p-4 text-white">
-            <TrendingUp className="h-6 w-6 mx-auto mb-1" />
-            <span className="text-xs">Home</span>
-          </Link>
-          <Link href="/dashboard/staking" className="p-4 text-white">
-            <Coins className="h-6 w-6 mx-auto mb-1" />
-            <span className="text-xs">Staking</span>
-          </Link>
-          <Link href="/dashboard/bnx-staking" className="p-4 text-white bg-blue-700 rounded-t-2xl">
-            <Coins className="h-6 w-6 mx-auto mb-1" />
-            <span className="text-xs">JRV Staking</span>
-          </Link>
-          <Link href="/dashboard/profile" className="p-4 text-white">
-            <Settings className="h-6 w-6 mx-auto mb-1" />
-            <span className="text-xs">Profile</span>
-          </Link>
-          <button onClick={handleSignOut} className="p-4 text-white">
-            <LogOut className="h-6 w-6 mx-auto mb-1" />
-            <span className="text-xs">Logout</span>
-          </button>
-        </div>
-      </nav>
+      {/* Dock Navigation */}
+      <DockNavbar onSignOut={handleSignOut} />
 
       {/* Income Details Modal */}
       {showIncomeModal && (
@@ -595,6 +657,116 @@ export default function DashboardPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* JRC Purchase Modal */}
+      {showJrcModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="jarvis-card rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white flex items-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-3">
+                  <Coins className="h-4 w-4 text-white" />
+                </div>
+                Buy JRC Coins
+              </h3>
+              <button
+                onClick={() => {
+                  setShowJrcModal(false)
+                  setJrcAmount('')
+                  setJrcError('')
+                  setJrcSuccess('')
+                }}
+                className="text-gray-400 hover:text-white"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Current Rate */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+              <div className="text-center">
+                <p className="text-blue-400 font-semibold">Current Rate</p>
+                <p className="text-2xl font-bold text-white">$0.10 per JRC</p>
+                <p className="text-gray-300 text-sm">1 JRC = $0.10 USDT</p>
+              </div>
+            </div>
+
+            {/* Available Balance */}
+            <div className="bg-green-500/10 rounded-lg p-3 mb-4">
+              <p className="text-gray-300 text-sm">Available Fund Wallet Balance</p>
+              <p className="text-xl font-bold text-green-400">${profile?.fund_wallet_balance?.toFixed(2) || '0.00'}</p>
+            </div>
+
+            {jrcError && (
+              <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4">
+                {jrcError}
+              </div>
+            )}
+
+            {jrcSuccess && (
+              <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg mb-4">
+                {jrcSuccess}
+              </div>
+            )}
+
+            {/* Purchase Form */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white text-sm font-medium mb-2">
+                  JRC Coins to Purchase
+                </label>
+                <input
+                  type="number"
+                  value={jrcAmount}
+                  onChange={(e) => setJrcAmount(e.target.value)}
+                  placeholder="Enter amount of JRC coins"
+                  min="1"
+                  step="1"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                {jrcAmount && (
+                  <p className="text-gray-300 text-sm mt-2">
+                    Total Cost: ${(parseFloat(jrcAmount) * 0.1).toFixed(2)} USDT
+                  </p>
+                )}
+              </div>
+
+              {/* Quick Amount Buttons */}
+              <div className="grid grid-cols-4 gap-2">
+                {[100, 500, 1000, 5000].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => setJrcAmount(amount.toString())}
+                    className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors"
+                  >
+                    {amount.toLocaleString()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Purchase Button */}
+              <button
+                onClick={handleJrcPurchase}
+                disabled={jrcPurchasing || !jrcAmount || parseFloat(jrcAmount) <= 0}
+                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed py-3 rounded-lg text-white font-semibold transition-colors"
+              >
+                {jrcPurchasing ? 'Processing...' : 'Purchase JRC Coins'}
+              </button>
+            </div>
+
+            {/* Purchase Info */}
+            <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <h4 className="text-yellow-400 font-semibold mb-2">Purchase Information</h4>
+              <ul className="text-yellow-200 text-sm space-y-1">
+                <li>• Tokens are purchased instantly</li>
+                <li>• Funds are deducted from your Fund Wallet</li>
+                <li>• JRC coins are added to your coin balance</li>
+                <li>• Rate: $0.10 per JRC coin</li>
+              </ul>
             </div>
           </div>
         </div>

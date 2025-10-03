@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase'
 import { ArrowLeft, Coins, History } from 'lucide-react'
 import Link from 'next/link'
+import { dualReferralService } from '@/lib/referralService'
 
 interface Profile {
   total_jarvis_tokens: number
@@ -66,13 +67,13 @@ export default function JRVStakingPage() {
     const stakingAmount = parseFloat(amount)
     
     if (stakingAmount < 100) {
-      setError('Minimum JRV staking amount is 100 JRV')
+      setError('Minimum JRC staking amount is 100 JRC')
       setIsSubmitting(false)
       return
     }
 
     if (!profile || stakingAmount > profile.total_jarvis_tokens) {
-      setError('Insufficient Jarvis Token balance')
+      setError('Insufficient Jarvis Coin balance')
       setIsSubmitting(false)
       return
     }
@@ -94,14 +95,14 @@ export default function JRVStakingPage() {
           amount: stakingAmount,
           net_amount: stakingAmount,
           status: 'completed',
-          description: `JRV Staking - ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY`
+          description: `JRC Staking - ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY`
         })
         .select()
         .single()
 
       if (transactionError) throw transactionError
 
-      // Deduct from Jarvis tokens
+      // Deduct from Jarvis coins
       const { error: tokenError } = await supabase
         .from('profiles')
         .update({ 
@@ -111,7 +112,23 @@ export default function JRVStakingPage() {
 
       if (tokenError) throw tokenError
 
-      setSuccess(`Successfully staked ${stakingAmount} JRV for ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY!`)
+      // Process dual referral commissions (USDT + JRC) - convert JRC amount to USDT equivalent for calculation
+      try {
+        // Assuming 1 JRC = $0.01 for referral calculation purposes
+        const usdtEquivalent = stakingAmount * 0.01
+        await dualReferralService.processDualReferralCommissions({
+          userId: user?.id || '',
+          amount: usdtEquivalent,
+          transactionType: 'staking',
+          planType: `JRC ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY`
+        })
+        console.log('Dual referral commissions processed successfully for JRC staking')
+      } catch (referralError) {
+        console.error('Error processing referral commissions:', referralError)
+        // Don't fail the staking if referral processing fails
+      }
+
+      setSuccess(`Successfully staked ${stakingAmount} JRC for ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY!`)
       setAmount('')
       setStakingPeriod('')
       
@@ -141,7 +158,7 @@ export default function JRVStakingPage() {
           <Link href="/dashboard" className="text-white hover:text-blue-300">
             <ArrowLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-xl font-bold text-white">JRV Staking</h1>
+          <h1 className="text-xl font-bold text-white">JRC Staking</h1>
           <div></div>
         </div>
       </header>
@@ -150,8 +167,8 @@ export default function JRVStakingPage() {
         {/* Available Balance */}
         <div className="jarvis-card rounded-2xl p-6 mb-6 text-center">
           <h2 className="text-white text-lg mb-2">Available Jarvis Wallet</h2>
-          <p className="text-3xl font-bold text-yellow-400">{profile?.total_jarvis_tokens.toLocaleString() || '0'} JRV</p>
-          <p className="text-gray-300 text-sm mt-2">Amount in JRV</p>
+          <p className="text-3xl font-bold text-yellow-400">{profile?.total_jarvis_tokens.toLocaleString() || '0'} JRC</p>
+          <p className="text-gray-300 text-sm mt-2">Amount in JRC</p>
         </div>
 
         {error && (
@@ -166,34 +183,32 @@ export default function JRVStakingPage() {
           </div>
         )}
 
-        {/* JRV Staking Form */}
+        {/* JRC Staking Form */}
         <div className="jarvis-card rounded-2xl p-6 mb-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
+              <label className="block text-white text-sm font-medium mb-2">JRC Amount</label>
               <input
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="0 JRV"
+                placeholder="Enter JRC amount"
                 min="100"
                 step="1"
                 required
                 className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-lg text-white text-2xl text-center placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-center text-gray-300 text-sm mt-2">Amount in JRV</p>
             </div>
 
             <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Staking Period
-              </label>
+              <label className="block text-white text-sm font-medium mb-2">Staking Period</label>
               <select
                 value={stakingPeriod}
                 onChange={(e) => setStakingPeriod(e.target.value)}
                 required
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="" className="bg-gray-800">--Select--</option>
+                <option value="">Select staking period</option>
                 {stakingPeriods.map((period) => (
                   <option key={period.value} value={period.value} className="bg-gray-800">
                     {period.label} - {period.apy} APY
@@ -202,33 +217,21 @@ export default function JRVStakingPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-white text-sm font-medium mb-2">
-                Enter Password
-              </label>
-              <input
-                type="password"
-                required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your password"
-              />
-            </div>
-
             <button
               type="submit"
-              disabled={isSubmitting || !amount || !stakingPeriod}
+              disabled={isSubmitting}
               className="w-full jarvis-button py-4 rounded-lg text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Processing...' : 'SUBMIT'}
+              {isSubmitting ? 'Processing...' : 'Stake JRC'}
             </button>
           </form>
         </div>
 
-        {/* JRV Staking Periods Info */}
+        {/* JRC Staking Periods Info */}
         <div className="jarvis-card rounded-2xl p-6 mb-6">
           <h3 className="text-white font-bold text-lg mb-4 flex items-center">
             <Coins className="h-6 w-6 mr-2 text-yellow-400" />
-            JRV Staking Options
+            JRC Staking Options
           </h3>
           <div className="space-y-3">
             {stakingPeriods.map((period) => (
@@ -273,28 +276,28 @@ export default function JRVStakingPage() {
         >
           <div className="flex items-center space-x-3">
             <History className="h-6 w-6 text-blue-400" />
-            <span className="text-white font-semibold">JRV STAKING HISTORY</span>
+            <span className="text-white font-semibold">JRC STAKING HISTORY</span>
           </div>
         </Link>
 
         {/* Information */}
         <div className="mt-6 space-y-4">
           <div className="jarvis-card rounded-xl p-4">
-            <h3 className="text-white font-semibold mb-2">JRV Staking Information</h3>
+            <h3 className="text-white font-semibold mb-2">JRC Staking Information</h3>
             <ul className="text-gray-300 text-sm space-y-1">
-              <li>• Minimum staking: 100 JRV</li>
+              <li>• Minimum staking: 100 JRC</li>
               <li>• Higher APY than USD staking</li>
-              <li>• Rewards paid in JRV tokens</li>
+              <li>• Rewards paid in JRC coins</li>
               <li>• Longer periods = higher rewards</li>
-              <li>• Participate in token ecosystem growth</li>
+              <li>• Participate in coin ecosystem growth</li>
             </ul>
           </div>
 
           <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4">
-            <h4 className="text-blue-400 font-semibold mb-2">JRV Staking Benefits</h4>
+            <h4 className="text-blue-400 font-semibold mb-2">JRC Staking Benefits</h4>
             <p className="text-blue-200 text-sm">
-              Stake your JRV tokens to earn higher APY rewards while supporting the Jarvis AI ecosystem. 
-              Your staked tokens contribute to platform liquidity and governance.
+              Stake your JRC coins to earn higher APY rewards while supporting the Jarvis AI ecosystem. 
+              Your staked coins contribute to platform liquidity and governance.
             </p>
           </div>
         </div>

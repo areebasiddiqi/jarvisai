@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase'
 import { ArrowLeft, TrendingUp, Star, Shield, Coins } from 'lucide-react'
 import Link from 'next/link'
+import { dualReferralService } from '@/lib/referralService'
 
 interface Profile {
   fund_wallet_balance: number
@@ -162,6 +163,20 @@ export default function InvestPage() {
         })
 
       if (transactionError) throw transactionError
+
+      // Process dual referral commissions (USDT + JRV)
+      try {
+        await dualReferralService.processDualReferralCommissions({
+          userId: user?.id || '',
+          amount: investAmount,
+          transactionType: 'investment',
+          planType: plan.name
+        })
+        console.log('Dual referral commissions processed successfully')
+      } catch (referralError) {
+        console.error('Error processing referral commissions:', referralError)
+        // Don't fail the investment if referral processing fails
+      }
 
       setSuccess(`Successfully invested $${investAmount} in ${plan.name}! You earned ${tokensEarned.toLocaleString()} Jarvis Tokens.`)
       setAmount('')

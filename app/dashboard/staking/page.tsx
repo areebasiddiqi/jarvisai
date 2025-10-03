@@ -6,13 +6,15 @@ import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase'
 import { ArrowLeft, Coins, History } from 'lucide-react'
 import Link from 'next/link'
+import DockNavbar from '@/components/DockNavbar'
+import { dualReferralService } from '@/lib/referralService'
 
 interface Profile {
   fund_wallet_balance: number
 }
 
 export default function StakingPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [amount, setAmount] = useState('')
@@ -111,6 +113,20 @@ export default function StakingPage() {
 
       if (walletError) throw walletError
 
+      // Process dual referral commissions (USDT + JRV)
+      try {
+        await dualReferralService.processDualReferralCommissions({
+          userId: user?.id || '',
+          amount: stakingAmount,
+          transactionType: 'staking',
+          planType: `${selectedPeriod?.label} at ${selectedPeriod?.apy} APY`
+        })
+        console.log('Dual referral commissions processed successfully')
+      } catch (referralError) {
+        console.error('Error processing referral commissions:', referralError)
+        // Don't fail the staking if referral processing fails
+      }
+
       setSuccess(`Successfully staked $${stakingAmount} for ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY!`)
       setAmount('')
       setStakingPeriod('')
@@ -151,7 +167,7 @@ export default function StakingPage() {
         <div className="jarvis-card rounded-2xl p-6 mb-6 text-center">
           <h2 className="text-white text-lg mb-2">Available Fund Wallet</h2>
           <p className="text-3xl font-bold text-green-400">${profile?.fund_wallet_balance.toFixed(2) || '0.00'}</p>
-          <p className="text-gray-300 text-sm mt-2">Amount in USD</p>
+          <p className="text-gray-300 text-sm mt-2">Amount in USDT</p>
         </div>
 
         {/* Staking Notice */}
@@ -179,7 +195,7 @@ export default function StakingPage() {
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="0 BNX"
+                placeholder="0 USDT"
                 min="50"
                 step="0.01"
                 required
@@ -284,6 +300,12 @@ export default function StakingPage() {
           </div>
         </div>
       </div>
+
+      {/* Dock Navigation */}
+      <DockNavbar onSignOut={async () => {
+        await signOut()
+        router.push('/')
+      }} />
     </div>
   )
 }
