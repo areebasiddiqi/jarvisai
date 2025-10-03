@@ -85,12 +85,24 @@ export async function distributeProfits() {
     }
 
     // Update user balances and plan totals
-    for (const [userId, totalProfit] of userUpdates) {
+    for (const [userId, totalProfit] of Array.from(userUpdates.entries())) {
+      // Get current balance first
+      const { data: currentProfile, error: fetchError } = await supabaseAdmin
+        .from('profiles')
+        .select('main_wallet_balance')
+        .eq('id', userId)
+        .single()
+
+      if (fetchError) {
+        console.error(`Error fetching profile for user ${userId}:`, fetchError)
+        continue
+      }
+
       // Update user main wallet balance
       const { error: walletError } = await supabaseAdmin
         .from('profiles')
         .update({
-          main_wallet_balance: supabaseAdmin.raw(`main_wallet_balance + ${totalProfit}`)
+          main_wallet_balance: (currentProfile.main_wallet_balance || 0) + totalProfit
         })
         .eq('id', userId)
 
@@ -120,10 +132,22 @@ export async function distributeProfits() {
 
     // Update investment plans total profit earned
     for (const distribution of profitDistributions) {
+      // Get current total profit earned first
+      const { data: currentPlan, error: fetchPlanError } = await supabaseAdmin
+        .from('investment_plans')
+        .select('total_profit_earned')
+        .eq('id', distribution.plan_id)
+        .single()
+
+      if (fetchPlanError) {
+        console.error(`Error fetching plan ${distribution.plan_id}:`, fetchPlanError)
+        continue
+      }
+
       const { error: planUpdateError } = await supabaseAdmin
         .from('investment_plans')
         .update({
-          total_profit_earned: supabaseAdmin.raw(`total_profit_earned + ${distribution.profit_amount}`)
+          total_profit_earned: (currentPlan.total_profit_earned || 0) + distribution.profit_amount
         })
         .eq('id', distribution.plan_id)
 

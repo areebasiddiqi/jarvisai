@@ -255,7 +255,7 @@ class BSCService {
       const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction as string);
       
       console.log(`USDT transfer successful: ${amount} USDT to ${toAddress}`);
-      return receipt.transactionHash;
+      return receipt.transactionHash.toString();
     } catch (error) {
       console.error('Error transferring USDT:', error);
       throw error;

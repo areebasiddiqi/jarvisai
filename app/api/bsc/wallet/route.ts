@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BSCService from '@/lib/bsc-service'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 const BSC_CONFIG = {
   rpcUrl: process.env.BSC_RPC_URL || "https://bsc-dataseed1.binance.org/",
   contractAddress: process.env.PAYMENT_CONTRACT_ADDRESS || "",

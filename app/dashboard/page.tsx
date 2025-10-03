@@ -18,6 +18,7 @@ import {
   History,
   Settings,
   LogOut,
+  XCircle,
   MessageCircle
 } from 'lucide-react'
 import Link from 'next/link'
@@ -37,7 +38,6 @@ interface InvestmentPlan {
   investment_amount: number
   daily_percentage: number
   jarvis_tokens_earned: number
-  total_profit_earned: number
   is_active: boolean
   created_at: string
 }
@@ -45,7 +45,12 @@ interface InvestmentPlan {
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const [totalProfits, setTotalProfits] = useState(0)
+  const [showIncomeModal, setShowIncomeModal] = useState(false)
+  const [selectedIncomeType, setSelectedIncomeType] = useState<string>('')
+  const [incomeData, setIncomeData] = useState<any[]>([])
+  const [referralCommissions, setReferralCommissions] = useState(0)
   const [plans, setPlans] = useState<InvestmentPlan[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const supabase = createSupabaseClient()
@@ -84,11 +89,75 @@ export default function DashboardPage() {
       if (plansError) throw plansError
       setPlans(plansData || [])
 
+      // Calculate total profits
+      const calculatedProfits = (plansData || []).reduce((sum: number, plan: any) => sum + (plan.total_profit_earned || 0), 0)
+      setTotalProfits(calculatedProfits)
+
     } catch (error) {
       console.error('Error fetching user data:', error)
     } finally {
       setLoadingData(false)
     }
+  }
+
+  const handleViewIncome = async (incomeType: string) => {
+    setSelectedIncomeType(incomeType)
+    setIncomeData([])
+    
+    try {
+      switch (incomeType) {
+        case 'trade':
+          // Fetch investment profits
+          const { data: investments, error: investError } = await supabase
+            .from('investment_plans')
+            .select('*')
+            .eq('user_id', user?.id)
+            .order('created_at', { ascending: false })
+          
+          if (!investError) {
+            setIncomeData(investments || [])
+          }
+          break
+          
+        case 'referral':
+          // Fetch referral commissions
+          const { data: commissions, error: commError } = await supabase
+            .from('referral_commissions')
+            .select(`
+              *,
+              profiles!referral_commissions_referred_id_fkey(username, referral_code)
+            `)
+            .eq('referrer_id', user?.id)
+            .order('created_at', { ascending: false })
+          
+          if (!commError) {
+            setIncomeData(commissions || [])
+          }
+          break
+          
+        case 'tokens':
+          // Fetch token transactions
+          const { data: tokenTxs, error: tokenError } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user?.id)
+            .in('transaction_type', ['referral_bonus', 'signup_bonus'])
+            .order('created_at', { ascending: false })
+          
+          if (!tokenError) {
+            setIncomeData(tokenTxs || [])
+          }
+          break
+          
+        default:
+          setIncomeData([])
+      }
+    } catch (error) {
+      console.error('Error fetching income data:', error)
+      setIncomeData([])
+    }
+    
+    setShowIncomeModal(true)
   }
 
   const handleSignOut = async () => {
@@ -109,7 +178,6 @@ export default function DashboardPage() {
   }
 
   const totalInvestment = plans.reduce((sum, plan) => sum + plan.investment_amount, 0)
-  const totalProfits = plans.reduce((sum, plan) => sum + plan.total_profit_earned, 0)
 
   return (
     <div className="min-h-screen jarvis-gradient">
@@ -265,7 +333,12 @@ export default function DashboardPage() {
               <Coins className="h-6 w-6 text-yellow-400" />
               <div>
                 <p className="text-white font-semibold">Sign Up Token</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('tokens')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">100 JRV</p>
@@ -276,7 +349,12 @@ export default function DashboardPage() {
               <Coins className="h-6 w-6 text-yellow-400" />
               <div>
                 <p className="text-white font-semibold">JRV Referral Token</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('tokens')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">0 JRV</p>
@@ -287,7 +365,12 @@ export default function DashboardPage() {
               <TrendingUp className="h-6 w-6 text-green-400" />
               <div>
                 <p className="text-white font-semibold">Trade Income</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('trade')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">${totalProfits.toFixed(2)}</p>
@@ -298,7 +381,12 @@ export default function DashboardPage() {
               <Users className="h-6 w-6 text-purple-400" />
               <div>
                 <p className="text-white font-semibold">Level Income</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('referral')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">$0</p>
@@ -309,7 +397,12 @@ export default function DashboardPage() {
               <Gift className="h-6 w-6 text-pink-400" />
               <div>
                 <p className="text-white font-semibold">Reward Income</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('rewards')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">$0</p>
@@ -320,7 +413,12 @@ export default function DashboardPage() {
               <Coins className="h-6 w-6 text-blue-400" />
               <div>
                 <p className="text-white font-semibold">Staking Income</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('staking')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">$0</p>
@@ -331,7 +429,12 @@ export default function DashboardPage() {
               <Users className="h-6 w-6 text-orange-400" />
               <div>
                 <p className="text-white font-semibold">Staking Referral Income</p>
-                <button className="text-blue-400 text-sm">VIEW</button>
+                <button 
+                  onClick={() => handleViewIncome('staking-referral')}
+                  className="text-blue-400 text-sm hover:text-blue-300"
+                >
+                  VIEW
+                </button>
               </div>
             </div>
             <p className="text-white font-bold">$0</p>
@@ -397,6 +500,105 @@ export default function DashboardPage() {
           </button>
         </div>
       </nav>
+
+      {/* Income Details Modal */}
+      {showIncomeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="jarvis-card rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white">
+                {selectedIncomeType === 'trade' && 'Trade Income Details'}
+                {selectedIncomeType === 'referral' && 'Referral Commission Details'}
+                {selectedIncomeType === 'tokens' && 'Token Transaction Details'}
+                {selectedIncomeType === 'rewards' && 'Reward Income Details'}
+                {selectedIncomeType === 'staking' && 'Staking Income Details'}
+                {selectedIncomeType === 'staking-referral' && 'Staking Referral Income Details'}
+              </h3>
+              <button
+                onClick={() => setShowIncomeModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {incomeData.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-300">No data available for this income type</p>
+                </div>
+              ) : (
+                incomeData.map((item, index) => (
+                  <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    {selectedIncomeType === 'trade' && (
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-400">Plan Type</p>
+                          <p className="text-white font-semibold">Plan {item.plan_type}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Investment Amount</p>
+                          <p className="text-white">${item.investment_amount?.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Daily Percentage</p>
+                          <p className="text-green-400">{item.daily_percentage}%</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Date</p>
+                          <p className="text-white">{new Date(item.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedIncomeType === 'referral' && (
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-400">Commission Amount</p>
+                          <p className="text-white font-semibold">${item.commission_amount?.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Level</p>
+                          <p className="text-white">Level {item.level}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Commission %</p>
+                          <p className="text-green-400">{item.commission_percentage}%</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Date</p>
+                          <p className="text-white">{new Date(item.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedIncomeType === 'tokens' && (
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-400">Transaction Type</p>
+                          <p className="text-white font-semibold capitalize">{item.transaction_type?.replace('_', ' ')}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Amount</p>
+                          <p className="text-yellow-400">{item.amount} JRV</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Status</p>
+                          <p className="text-green-400 capitalize">{item.status}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Date</p>
+                          <p className="text-white">{new Date(item.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
