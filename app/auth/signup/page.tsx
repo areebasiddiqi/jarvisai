@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createSupabaseClient } from '@/lib/supabase'
 import { Bot, Eye, EyeOff, User, Mail, Phone, Globe } from 'lucide-react'
 
@@ -94,7 +95,13 @@ export default function SignUpPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
-            <Bot className="h-8 w-8 text-white" />
+            <Image 
+              src="/logo_32x32.png" 
+              alt="Jarvis Staking Logo" 
+              width={32} 
+              height={32} 
+              className="h-8 w-8"
+            />
             <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </Link>
           <div className="flex items-center justify-end mb-4">

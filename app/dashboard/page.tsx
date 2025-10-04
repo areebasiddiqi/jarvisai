@@ -24,6 +24,7 @@ import {
   Twitter
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import DockNavbar from '@/components/DockNavbar'
 
 interface Profile {
@@ -297,7 +298,13 @@ export default function DashboardPage() {
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="flex items-center space-x-1 sm:space-x-2">
-              <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+              <Image 
+                src="/logo_32x32.png" 
+                alt="Jarvis Staking Logo" 
+                width={32} 
+                height={32} 
+                className="h-6 w-6 sm:h-8 sm:w-8"
+              />
               <span className="text-lg sm:text-2xl font-bold text-white">Jarvis Staking</span>
             </div>
             <div className="bg-orange-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold">
@@ -353,7 +360,13 @@ export default function DashboardPage() {
             </div>
             <div className="text-right hidden sm:block">
               <div className="flex items-center space-x-2">
-                <Bot className="h-8 w-8 text-white" />
+                <Image 
+                  src="/logo_32x32.png" 
+                  alt="Jarvis Staking Logo" 
+                  width={32} 
+                  height={32} 
+                  className="h-8 w-8"
+                />
                 <span className="text-xl font-bold text-white">Jarvis Staking</span>
               </div>
               <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold mt-2">

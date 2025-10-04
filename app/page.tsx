@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Bot, TrendingUp, Shield, Users, ArrowRight, Star } from 'lucide-react'
 
 export default function HomePage() {
@@ -42,7 +43,13 @@ export default function HomePage() {
       <header className="relative z-10 container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bot className="h-8 w-8 text-white" />
+            <Image 
+              src="/logo_32x32.png" 
+              alt="Jarvis Staking Logo" 
+              width={32} 
+              height={32} 
+              className="w-8 h-8"
+            />
             <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </div>
           <div className="flex items-center space-x-4">
