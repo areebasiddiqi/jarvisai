@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import BSCService from '@/lib/bsc-service'
+import EmailService from '@/lib/email-service'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -123,6 +124,25 @@ export async function POST(request: NextRequest) {
 
     console.log("Deposit completed successfully")
 
+    // Send success email notification
+    try {
+      const emailService = new EmailService()
+      await emailService.sendDepositNotification(
+        user.email || '',
+        profile.full_name || 'User',
+        depositAmount,
+        'USDT',
+        'success',
+        txHash,
+        fee,
+        netAmount
+      )
+      console.log("Deposit success email sent")
+    } catch (emailError) {
+      console.error("Failed to send deposit success email:", emailError)
+      // Don't fail the transaction if email fails
+    }
+
     return NextResponse.json({
       success: true,
       message: "Deposit processed successfully",
@@ -133,6 +153,37 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error("Error processing BSC deposit:", error)
+    
+    // Send failure email notification if we have user info
+    try {
+      const supabase = createSupabaseServerClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single()
+        
+        const emailService = new EmailService()
+        await emailService.sendDepositNotification(
+          user.email || '',
+          profile?.full_name || 'User',
+          0, // Amount unknown in error case
+          'USDT',
+          'failed',
+          undefined,
+          undefined,
+          undefined,
+          error.message || "Failed to process deposit"
+        )
+        console.log("Deposit failure email sent")
+      }
+    } catch (emailError) {
+      console.error("Failed to send deposit failure email:", emailError)
+    }
+    
     return NextResponse.json({ error: error.message || "Failed to process deposit" }, { status: 500 })
   }
 }

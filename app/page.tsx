@@ -105,7 +105,7 @@ export default function HomePage() {
               <h3 className="text-2xl font-bold text-white mb-2">Plan A</h3>
               <p className="text-gray-300 mb-4">$1 to $50</p>
               <div className="text-3xl font-bold text-green-400 mb-2">2% Daily</div>
-              <p className="text-gray-300 mb-4">1,000 Jarvis Tokens</p>
+              <p className="text-gray-300 mb-4">100 Jarvis Tokens</p>
               <div className="text-sm text-gray-400">
                 Current: $0.1/token<br />
                 Future: $3/token
@@ -119,7 +119,7 @@ export default function HomePage() {
               <h3 className="text-2xl font-bold text-white mb-2">Plan B</h3>
               <p className="text-gray-300 mb-4">$51 to $500</p>
               <div className="text-3xl font-bold text-blue-400 mb-2">4% Daily</div>
-              <p className="text-gray-300 mb-4">10,000 Jarvis Tokens</p>
+              <p className="text-gray-300 mb-4">1,000 Jarvis Tokens</p>
               <div className="text-sm text-gray-400">
                 Current: $0.1/token<br />
                 Future: $3/token
@@ -136,7 +136,7 @@ export default function HomePage() {
               <h3 className="text-2xl font-bold text-white mb-2">Plan C</h3>
               <p className="text-gray-300 mb-4">$500 to $50,000</p>
               <div className="text-3xl font-bold text-purple-400 mb-2">5% Daily</div>
-              <p className="text-gray-300 mb-4">100,000 Jarvis Tokens</p>
+              <p className="text-gray-300 mb-4">10,000 Jarvis Tokens</p>
               <div className="text-sm text-gray-400">
                 Current: $0.1/token<br />
                 Future: $3/token

@@ -45,6 +45,20 @@ interface InvestmentPlan {
   created_at: string
 }
 
+interface JrcStakingPlan {
+  id: string
+  user_id: string
+  amount: number
+  staking_period: number
+  daily_percentage: number
+  start_date: string
+  end_date: string
+  status: 'active' | 'completed' | 'withdrawn'
+  total_profit_earned: number
+  rewards_claimed: number
+  created_at: string
+}
+
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
@@ -55,6 +69,8 @@ export default function DashboardPage() {
   const [incomeData, setIncomeData] = useState<any[]>([])
   const [referralCommissions, setReferralCommissions] = useState(0)
   const [plans, setPlans] = useState<InvestmentPlan[]>([])
+  const [jrcStakingPlans, setJrcStakingPlans] = useState<JrcStakingPlan[]>([])
+  const [totalJrcEarned, setTotalJrcEarned] = useState(0)
   const [loadingData, setLoadingData] = useState(true)
   const [showJrcModal, setShowJrcModal] = useState(false)
   const [jrcAmount, setJrcAmount] = useState('')
@@ -100,6 +116,24 @@ export default function DashboardPage() {
       // Calculate total profits
       const calculatedProfits = (plansData || []).reduce((sum: number, plan: any) => sum + (plan.total_profit_earned || 0), 0)
       setTotalProfits(calculatedProfits)
+
+      // Fetch JRC staking plans
+      const { data: jrcStakingData, error: jrcStakingError } = await supabase
+        .from('jrc_staking_plans')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+
+      if (jrcStakingError) {
+        console.error('Error fetching JRC staking plans:', jrcStakingError)
+      } else {
+        setJrcStakingPlans(jrcStakingData || [])
+        
+        // Calculate total JRC earned from all staking plans
+        const totalJrcEarned = (jrcStakingData || []).reduce((sum: number, plan: JrcStakingPlan) => 
+          sum + (plan.total_profit_earned || 0), 0)
+        setTotalJrcEarned(totalJrcEarned)
+      }
 
     } catch (error) {
       console.error('Error fetching user data:', error)
@@ -156,6 +190,19 @@ export default function DashboardPage() {
             setIncomeData(tokenTxs || [])
           }
           break
+
+        case 'staking-referral':
+          // Fetch JRC staking plans and distributions
+          const { data: stakingPlans, error: stakingError } = await supabase
+            .from('jrc_staking_plans')
+            .select('*')
+            .eq('user_id', user?.id)
+            .order('created_at', { ascending: false })
+          
+          if (!stakingError) {
+            setIncomeData(stakingPlans || [])
+          }
+          break
           
         default:
           setIncomeData([])
@@ -181,8 +228,6 @@ export default function DashboardPage() {
     setJrcSuccess('')
 
     const coinsToBuy = parseFloat(jrcAmount)
-    const jrcRate = 0.1 // $0.1 per JRC coin
-    const totalCost = coinsToBuy * jrcRate
 
     // Validation
     if (coinsToBuy <= 0) {
@@ -191,49 +236,31 @@ export default function DashboardPage() {
       return
     }
 
-    if (totalCost > profile.fund_wallet_balance) {
-      setJrcError(`Insufficient fund wallet balance. You need $${totalCost.toFixed(2)} but only have $${profile.fund_wallet_balance.toFixed(2)}`)
-      setJrcPurchasing(false)
-      return
-    }
-
     try {
-      // Update user balances
-      const newFundBalance = profile.fund_wallet_balance - totalCost
-      const newJrcBalance = profile.total_jarvis_tokens + coinsToBuy
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          fund_wallet_balance: newFundBalance,
-          total_jarvis_tokens: newJrcBalance
+      const response = await fetch('/api/jrc/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jrcAmount: jrcAmount
         })
-        .eq('id', user?.id)
+      })
 
-      if (updateError) throw updateError
+      const data = await response.json()
 
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user?.id,
-          transaction_type: 'deposit',
-          amount: totalCost,
-          net_amount: totalCost,
-          status: 'completed',
-          description: `Purchased ${coinsToBuy.toLocaleString()} JRC coins at $${jrcRate} per coin`
-        })
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to purchase JRC coins')
+      }
 
-      if (transactionError) throw transactionError
-
-      // Update local state
+      // Update local state with response data
       setProfile((prev: any) => ({
         ...prev,
-        fund_wallet_balance: newFundBalance,
-        total_jarvis_tokens: newJrcBalance
+        fund_wallet_balance: data.newFundBalance,
+        total_jarvis_tokens: data.newJrcBalance
       }))
 
-      setJrcSuccess(`Successfully purchased ${coinsToBuy.toLocaleString()} JRC coins for $${totalCost.toFixed(2)}!`)
+      setJrcSuccess(data.message)
       setJrcAmount('')
       
       // Close modal after 2 seconds
@@ -500,7 +527,7 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <Users className="h-5 w-5 sm:h-6 sm:w-6 text-orange-400" />
               <div>
-                <p className="text-white font-semibold text-sm sm:text-base">Staking Referral Income</p>
+                <p className="text-white font-semibold text-sm sm:text-base">Jarvis Staking Reward</p>
                 <button 
                   onClick={() => handleViewIncome('staking-referral')}
                   className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
@@ -509,7 +536,7 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold text-sm sm:text-base">$0</p>
+            <p className="text-white font-bold text-sm sm:text-base">JRC {totalJrcEarned.toFixed(2)}</p>
           </div>
         </div>
 
@@ -561,7 +588,7 @@ export default function DashboardPage() {
                 {selectedIncomeType === 'tokens' && 'Token Transaction Details'}
                 {selectedIncomeType === 'rewards' && 'Reward Income Details'}
                 {selectedIncomeType === 'staking' && 'Staking Income Details'}
-                {selectedIncomeType === 'staking-referral' && 'Staking Referral Income Details'}
+                {selectedIncomeType === 'staking-referral' && 'JRC Staking Reward Details'}
               </h3>
               <button
                 onClick={() => setShowIncomeModal(false)}
@@ -638,6 +665,45 @@ export default function DashboardPage() {
                         <div>
                           <p className="text-gray-400">Date</p>
                           <p className="text-white">{new Date(item.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedIncomeType === 'staking-referral' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                        <div>
+                          <p className="text-gray-400">Staking Amount</p>
+                          <p className="text-white font-semibold">{item.amount} JRC</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Staking Period</p>
+                          <p className="text-white">{item.staking_period} days</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Daily Percentage</p>
+                          <p className="text-green-400">{item.daily_percentage}%</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Total Earned</p>
+                          <p className="text-yellow-400">{item.total_profit_earned?.toFixed(2)} JRC</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Status</p>
+                          <p className={`capitalize ${item.status === 'active' ? 'text-green-400' : item.status === 'completed' ? 'text-blue-400' : 'text-gray-400'}`}>
+                            {item.status}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Start Date</p>
+                          <p className="text-white">{new Date(item.start_date).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">End Date</p>
+                          <p className="text-white">{new Date(item.end_date).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Rewards Claimed</p>
+                          <p className="text-purple-400">{item.rewards_claimed?.toFixed(2)} JRC</p>
                         </div>
                       </div>
                     )}

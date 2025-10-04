@@ -72,129 +72,39 @@ export default function TransferPage() {
     }
 
     try {
-      if (transferType === 'main-to-fund') {
-        // Main to Fund Transfer
-        if (transferAmount > profile.main_wallet_balance) {
-          setError('Insufficient main wallet balance')
-          setIsSubmitting(false)
-          return
-        }
-
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            main_wallet_balance: profile.main_wallet_balance - transferAmount,
-            fund_wallet_balance: profile.fund_wallet_balance + transferAmount
-          })
-          .eq('id', user?.id)
-
-        if (updateError) throw updateError
-
-        // Create transaction record
-        await supabase.from('transactions').insert({
-          user_id: user?.id,
-          transaction_type: 'wallet_transfer',
+      const response = await fetch('/api/transfer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transferType,
           amount: transferAmount,
-          net_amount: transferAmount,
-          status: 'completed',
-          description: 'Transfer from Main to Fund Wallet'
+          receiverId: transferType === 'fund-to-fund' ? receiverId : undefined
         })
+      })
 
-        setSuccess(`Successfully transferred $${transferAmount} from Main Wallet to Fund Wallet`)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Transfer failed')
+      }
+
+      // Update local state based on transfer type
+      if (transferType === 'main-to-fund') {
         setProfile(prev => prev ? {
           ...prev,
-          main_wallet_balance: prev.main_wallet_balance - transferAmount,
-          fund_wallet_balance: prev.fund_wallet_balance + transferAmount
+          main_wallet_balance: data.newMainBalance,
+          fund_wallet_balance: data.newFundBalance
         } : null)
-
       } else if (transferType === 'fund-to-fund') {
-        // Fund to Fund Transfer (to another user)
-        if (transferAmount > profile.fund_wallet_balance) {
-          setError('Insufficient fund wallet balance')
-          setIsSubmitting(false)
-          return
-        }
-
-        if (!receiverId) {
-          setError('Please enter receiver ID')
-          setIsSubmitting(false)
-          return
-        }
-
-        // Check if receiver exists
-        const { data: receiver, error: receiverError } = await supabase
-          .from('profiles')
-          .select('id, referral_code')
-          .eq('referral_code', receiverId)
-          .single()
-
-        if (receiverError || !receiver) {
-          setError('Receiver not found')
-          setIsSubmitting(false)
-          return
-        }
-
-        if (receiver.id === user?.id) {
-          setError('Cannot transfer to yourself')
-          setIsSubmitting(false)
-          return
-        }
-
-        // Perform transfer
-        const { error: senderError } = await supabase
-          .from('profiles')
-          .update({
-            fund_wallet_balance: profile.fund_wallet_balance - transferAmount
-          })
-          .eq('id', user?.id)
-
-        if (senderError) throw senderError
-
-        // Get receiver's current balance first
-        const { data: receiverProfile, error: receiverFetchError } = await supabase
-          .from('profiles')
-          .select('fund_wallet_balance')
-          .eq('id', receiver.id)
-          .single()
-
-        if (receiverFetchError) throw receiverFetchError
-
-        const { error: receiverUpdateError } = await supabase
-          .from('profiles')
-          .update({
-            fund_wallet_balance: receiverProfile.fund_wallet_balance + transferAmount
-          })
-          .eq('id', receiver.id)
-
-        if (receiverUpdateError) throw receiverUpdateError
-
-        // Create transaction records
-        await supabase.from('transactions').insert([
-          {
-            user_id: user?.id,
-            transaction_type: 'transfer_sent',
-            amount: transferAmount,
-            net_amount: transferAmount,
-            status: 'completed',
-            description: `Transfer to ${receiverId}`
-          },
-          {
-            user_id: receiver.id,
-            transaction_type: 'transfer_received',
-            amount: transferAmount,
-            net_amount: transferAmount,
-            status: 'completed',
-            description: `Transfer from ${user?.email}`
-          }
-        ])
-
-        setSuccess(`Successfully transferred $${transferAmount} to ${receiverId}`)
         setProfile(prev => prev ? {
           ...prev,
-          fund_wallet_balance: prev.fund_wallet_balance - transferAmount
+          fund_wallet_balance: data.newFundBalance
         } : null)
       }
 
+      setSuccess(data.message)
       setAmount('')
       setReceiverId('')
       setTransferType(null)
