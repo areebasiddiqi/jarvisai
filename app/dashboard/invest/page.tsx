@@ -44,7 +44,7 @@ export default function InvestPage() {
     },
     C: {
       name: 'Plan C',
-      minAmount: 500,
+      minAmount: 501,
       maxAmount: 50000,
       dailyPercentage: 5,
       tokensPerDollar: 200, // 100000 tokens for $500 minimum

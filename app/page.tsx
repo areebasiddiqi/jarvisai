@@ -134,7 +134,7 @@ export default function HomePage() {
                 <Shield className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Plan C</h3>
-              <p className="text-gray-300 mb-4">$500 to $50,000</p>
+              <p className="text-gray-300 mb-4">$501 to $50,000</p>
               <div className="text-3xl font-bold text-purple-400 mb-2">5% Daily</div>
               <p className="text-gray-300 mb-4">10,000 Jarvis Tokens</p>
               <div className="text-sm text-gray-400">
