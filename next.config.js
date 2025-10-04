@@ -5,6 +5,7 @@ const nextConfig = {
   },
   images: {
     domains: ['localhost'],
+    formats: ['image/webp', 'image/avif'],
   },
 }
 

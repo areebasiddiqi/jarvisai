@@ -304,6 +304,8 @@ export default function DashboardPage() {
                 width={32} 
                 height={32} 
                 className="h-6 w-6 sm:h-8 sm:w-8"
+                priority
+                unoptimized={process.env.NODE_ENV === 'development'}
               />
               <span className="text-lg sm:text-2xl font-bold text-white">Jarvis Staking</span>
             </div>
@@ -366,6 +368,7 @@ export default function DashboardPage() {
                   width={32} 
                   height={32} 
                   className="h-8 w-8"
+                  unoptimized={process.env.NODE_ENV === 'development'}
                 />
                 <span className="text-xl font-bold text-white">Jarvis Staking</span>
               </div>

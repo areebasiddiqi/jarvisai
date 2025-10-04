@@ -101,6 +101,8 @@ export default function SignUpPage() {
               width={32} 
               height={32} 
               className="h-8 w-8"
+              priority
+              unoptimized={process.env.NODE_ENV === 'development'}
             />
             <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </Link>
