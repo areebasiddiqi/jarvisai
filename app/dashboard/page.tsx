@@ -19,7 +19,9 @@ import {
   Settings,
   LogOut,
   XCircle,
-  MessageCircle
+  MessageCircle,
+  Youtube,
+  Twitter
 } from 'lucide-react'
 import Link from 'next/link'
 import DockNavbar from '@/components/DockNavbar'
@@ -269,7 +271,7 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="flex items-center space-x-1 sm:space-x-2">
               <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-              <span className="text-lg sm:text-2xl font-bold text-white">Jarvis AI</span>
+              <span className="text-lg sm:text-2xl font-bold text-white">Jarvis Staking</span>
             </div>
             <div className="bg-orange-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold">
               Big Day 2024
@@ -283,6 +285,26 @@ export default function DashboardPage() {
               <p className="text-xs text-blue-300">User ID: {profile.referral_code}</p>
             </div>
             <div className="flex items-center space-x-1 sm:space-x-2">
+              {/* Social Media Icons */}
+              <a 
+                href="https://youtube.com/@jarvisstaking" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-1.5 sm:p-2 text-white hover:bg-red-600/20 hover:text-red-400 rounded-full transition-all duration-300"
+                title="Follow us on YouTube"
+              >
+                <Youtube className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
+              <a 
+                href="https://twitter.com/jarvisstaking" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-1.5 sm:p-2 text-white hover:bg-blue-500/20 hover:text-blue-400 rounded-full transition-all duration-300"
+                title="Follow us on Twitter"
+              >
+                <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
+              {/* Existing buttons */}
               <button className="p-1.5 sm:p-2 text-white hover:bg-white/10 rounded-full">
                 <Send className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
@@ -305,7 +327,7 @@ export default function DashboardPage() {
             <div className="text-right hidden sm:block">
               <div className="flex items-center space-x-2">
                 <Bot className="h-8 w-8 text-white" />
-                <span className="text-xl font-bold text-white">Jarvis AI</span>
+                <span className="text-xl font-bold text-white">Jarvis Staking</span>
               </div>
               <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold mt-2">
                 Big Day 2024

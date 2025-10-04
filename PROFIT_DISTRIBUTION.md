@@ -1,7 +1,7 @@
 # Profit Distribution System
 
 ## Overview
-The Jarvis AI platform includes an automated profit distribution system that distributes hourly profits to users based on their active investment plans.
+The Jarvis Staking platform includes an automated profit distribution system that distributes hourly profits to users based on their active investment plans.
 
 ## How It Works
 

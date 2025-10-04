@@ -123,12 +123,12 @@ export default function ReferralPage() {
     if (!profile) return
 
     const referralLink = `${window.location.origin}/auth/signup?ref=${profile.referral_code}`
-    const shareText = `Join Jarvis AI and start earning with smart crypto investments! Use my referral code: ${profile.referral_code}`
+    const shareText = `Join Jarvis Staking and start earning with smart crypto investments! Use my referral code: ${profile.referral_code}`
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join Jarvis AI',
+          title: 'Join Jarvis Staking',
           text: shareText,
           url: referralLink
         })

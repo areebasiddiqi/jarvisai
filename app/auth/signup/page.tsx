@@ -95,7 +95,7 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
             <Bot className="h-8 w-8 text-white" />
-            <span className="text-2xl font-bold text-white">Jarvis AI</span>
+            <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </Link>
           <div className="flex items-center justify-end mb-4">
             <Link href="/auth/signin" className="text-blue-300 hover:text-white transition-colors flex items-center">

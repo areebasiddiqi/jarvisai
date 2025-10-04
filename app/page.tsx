@@ -43,7 +43,7 @@ export default function HomePage() {
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Bot className="h-8 w-8 text-white" />
-            <span className="text-2xl font-bold text-white">Jarvis AI</span>
+            <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link 
@@ -197,7 +197,7 @@ export default function HomePage() {
       <footer className="relative z-10 border-t border-white/20 mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-300">
-            <p>&copy; 2024 Jarvis AI. All rights reserved.</p>
+            <p>&copy; 2024 Jarvis Staking. All rights reserved.</p>
             <p className="mt-2">Smart Crypto Growth Platform</p>
           </div>
         </div>

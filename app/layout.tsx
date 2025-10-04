@@ -6,8 +6,8 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Jarvis AI - Smart Crypto Growth Platform',
-  description: 'Invest in Future Smart Crypto Growth with Jarvis AI. Revolutionary cryptocurrency investment platform offering secure, decentralized alternatives to traditional money.',
+  title: 'Jarvis Staking - Smart Crypto Growth Platform',
+  description: 'Invest in Future Smart Crypto Growth with Jarvis Staking. Revolutionary cryptocurrency investment platform offering secure, decentralized alternatives to traditional money.',
 }
 
 export default function RootLayout({
