@@ -5,9 +5,9 @@ A comprehensive cryptocurrency investment platform built with Next.js, Supabase,
 ## 🚀 Features
 
 ### Investment Plans
-- **Plan A**: $1-$50, 2% daily returns, 1,000 JRV tokens
-- **Plan B**: $51-$500, 4% daily returns, 10,000 JRV tokens  
-- **Plan C**: $500-$50,000, 5% daily returns, 100,000 JRV tokens
+- **Plan A**: $1-$50, 2% daily returns, 100 JRC coins
+- **Plan B**: $51-$500, 4% daily returns, 1,000 JRC coins  
+- **Plan C**: $500-$50,000, 5% daily returns, 10,000 JRC coins
 
 ### Referral System
 - 10-level deep commission structure
@@ -29,8 +29,8 @@ A comprehensive cryptocurrency investment platform built with Next.js, Supabase,
 
 ### Staking Options
 - **USD Staking**: 8-25% APY based on lock period
-- **JRV Token Staking**: 10-30% APY for token holders
-- Minimum $50 for USD staking, 100 JRV for token staking
+- **JRC Coin Staking**: 10-30% APY for coin holders
+- Minimum $50 for USD staking, 100 JRC for coin staking
 
 ### Transaction Fees
 - **Deposit Fee**: 1% of deposit amount

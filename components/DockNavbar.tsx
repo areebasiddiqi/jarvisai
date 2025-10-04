@@ -42,9 +42,9 @@ export default function DockNavbar({ onSignOut }: DockNavbarProps) {
       label: 'Deposit'
     },
     {
-      href: '/dashboard/staking',
+      href: '/dashboard/invest',
       icon: Coins,
-      label: 'Staking'
+      label: 'Stake USDT'
     },
     {
       href: '/dashboard/transfer',
@@ -114,7 +114,7 @@ export default function DockNavbar({ onSignOut }: DockNavbarProps) {
                       group-hover:shadow-lg
                     `}>
                       <Icon className={`
-                        h-4 w-4 md:h-5 md:w-5 transition-all duration-300
+                        h-6 w-6 md:h-7 md:w-7 transition-all duration-300
                         ${active ? 'drop-shadow-lg' : ''}
                       `} />
                       
@@ -155,7 +155,7 @@ export default function DockNavbar({ onSignOut }: DockNavbarProps) {
                   ${hoveredItem === 'logout' ? 'md:scale-125 md:-translate-y-1' : ''}
                   group-hover:shadow-lg
                 `}>
-                  <LogOut className="h-4 w-4 md:h-5 md:w-5" />
+                  <LogOut className="h-5 w-5 md:h-6 md:w-6" />
                 </div>
               </button>
             </div>

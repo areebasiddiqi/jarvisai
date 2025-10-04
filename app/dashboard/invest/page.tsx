@@ -104,14 +104,14 @@ export default function InvestPage() {
     }
 
     try {
-      // Calculate tokens earned
-      let tokensEarned = 0
+      // Calculate coins earned
+      let coinsEarned = 0
       if (selectedPlan === 'A') {
-        tokensEarned = 1000
+        coinsEarned = 100
       } else if (selectedPlan === 'B') {
-        tokensEarned = 10000
+        coinsEarned = 1000
       } else if (selectedPlan === 'C') {
-        tokensEarned = 100000
+        coinsEarned = 10000
       }
 
       // Create investment plan
@@ -122,7 +122,7 @@ export default function InvestPage() {
           plan_type: selectedPlan,
           investment_amount: investAmount,
           daily_percentage: plan.dailyPercentage,
-          jarvis_tokens_earned: tokensEarned,
+          jarvis_tokens_earned: coinsEarned,
         })
         .select()
         .single()
@@ -143,7 +143,7 @@ export default function InvestPage() {
         .from('profiles')
         .update({
           fund_wallet_balance: profile.fund_wallet_balance - investAmount,
-          total_jarvis_tokens: (currentProfile.total_jarvis_tokens || 0) + tokensEarned
+          total_jarvis_tokens: (currentProfile.total_jarvis_tokens || 0) + coinsEarned
         })
         .eq('id', user?.id)
 
@@ -178,7 +178,7 @@ export default function InvestPage() {
         // Don't fail the investment if referral processing fails
       }
 
-      setSuccess(`Successfully invested $${investAmount} in ${plan.name}! You earned ${tokensEarned.toLocaleString()} Jarvis Tokens.`)
+      setSuccess(`Successfully invested $${investAmount} in ${plan.name}! You earned ${coinsEarned.toLocaleString()} Jarvis Coins.`)
       setAmount('')
       setSelectedPlan(null)
 
@@ -261,9 +261,9 @@ export default function InvestPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-yellow-400 font-bold">
-                      {key === 'A' ? '1,000' : key === 'B' ? '10,000' : '100,000'} JRV
+                      {key === 'A' ? '100' : key === 'B' ? '1,000' : '10,000'} JRC
                     </p>
-                    <p className="text-gray-400 text-sm">Tokens</p>
+                    <p className="text-gray-400 text-sm">Coins</p>
                   </div>
                 </div>
                 
@@ -290,20 +290,20 @@ export default function InvestPage() {
         <div className="jarvis-card rounded-2xl p-6 mb-6">
           <h3 className="text-white font-bold text-lg mb-4 flex items-center">
             <Coins className="h-6 w-6 mr-2 text-yellow-400" />
-            Jarvis Token Information
+            Jarvis Coin Information
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-300">Current Price:</span>
-              <span className="text-white font-semibold">$0.1 per JRV</span>
+              <span className="text-white font-semibold">$0.1 per JRC</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Future Listing:</span>
-              <span className="text-green-400 font-semibold">$3.0 per JRV</span>
+              <span className="text-green-400 font-semibold">$3.0 per JRC</span>
             </div>
             <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-3 mt-4">
               <p className="text-center text-white text-sm">
-                🚀 <strong>Potential 30x Growth!</strong> Secure your tokens now at discounted price.
+                🚀 <strong>Potential 30x Growth!</strong> Secure your coins now at discounted price.
               </p>
             </div>
           </div>
@@ -336,7 +336,7 @@ export default function InvestPage() {
             <li>• Profits are added to your main wallet every hour</li>
             <li>• You can only withdraw profits, not principal</li>
             <li>• Multiple investments in different plans allowed</li>
-            <li>• Jarvis Tokens are awarded instantly</li>
+            <li>• Jarvis Coins are awarded instantly</li>
           </ul>
         </div>
       </div>

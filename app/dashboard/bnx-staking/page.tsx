@@ -12,7 +12,7 @@ interface Profile {
   total_jarvis_tokens: number
 }
 
-export default function JRVStakingPage() {
+export default function JRCStakingPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -24,11 +24,11 @@ export default function JRVStakingPage() {
   const supabase = createSupabaseClient()
 
   const stakingPeriods = [
-    { value: '30', label: '30 Days', apy: '10%' },
-    { value: '60', label: '60 Days', apy: '15%' },
-    { value: '90', label: '90 Days', apy: '20%' },
-    { value: '180', label: '180 Days', apy: '25%' },
-    { value: '365', label: '365 Days', apy: '30%' }
+    { value: '30', label: '30 Days', apy: '3% Daily' },
+    { value: '60', label: '60 Days', apy: '5% Daily' },
+    { value: '90', label: '90 Days', apy: '6% Daily' },
+    { value: '180', label: '180 Days', apy: '8% Daily' },
+    { value: '365', label: '365 Days', apy: '10% Daily' }
   ]
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function JRVStakingPage() {
     }
 
     try {
-      // Create JRV staking transaction
+      // Create JRC staking transaction
       const selectedPeriod = stakingPeriods.find(p => p.value === stakingPeriod)
       const { data: transaction, error: transactionError } = await supabase
         .from('transactions')
@@ -95,12 +95,33 @@ export default function JRVStakingPage() {
           amount: stakingAmount,
           net_amount: stakingAmount,
           status: 'completed',
-          description: `JRC Staking - ${selectedPeriod?.label} at ${selectedPeriod?.apy} APY`
+          description: `JRC Staking - ${stakingAmount} coins for ${selectedPeriod?.value} days at ${selectedPeriod?.apy} APY`
         })
         .select()
         .single()
 
       if (transactionError) throw transactionError
+
+      // Create JRC staking plan record
+      const dailyPercentage = parseFloat(selectedPeriod?.apy.replace('% Daily', '') || '3')
+      const stakingPeriodDays = parseInt(selectedPeriod?.value || '30')
+      const endDate = new Date()
+      endDate.setDate(endDate.getDate() + stakingPeriodDays)
+
+      const { data: stakingPlan, error: stakingError } = await supabase
+        .from('jrc_staking_plans')
+        .insert({
+          user_id: user?.id,
+          amount: stakingAmount,
+          staking_period: stakingPeriodDays,
+          daily_percentage: dailyPercentage,
+          end_date: endDate.toISOString(),
+          transaction_id: transaction.id
+        })
+        .select()
+        .single()
+
+      if (stakingError) throw stakingError
 
       // Deduct from Jarvis coins
       const { error: tokenError } = await supabase
@@ -255,21 +276,21 @@ export default function JRVStakingPage() {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-300">Current Price:</span>
-              <span className="text-white font-semibold">$0.1 per JRV</span>
+              <span className="text-white font-semibold">$0.1 per JRC</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Future Listing:</span>
-              <span className="text-green-400 font-semibold">$3.0 per JRV</span>
+              <span className="text-green-400 font-semibold">$3.0 per JRC</span>
             </div>
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-3 mt-4">
               <p className="text-center text-white text-sm">
-                🚀 <strong>Stake JRV tokens and earn rewards while holding for future growth!</strong>
+                🚀 <strong>Stake JRC coins and earn rewards while holding for future growth!</strong>
               </p>
             </div>
           </div>
         </div>
 
-        {/* JRV Staking History Button */}
+        {/* JRC Staking History Button */}
         <Link 
           href="/dashboard/bnx-staking/history"
           className="jarvis-card rounded-xl p-4 flex items-center justify-between hover:bg-white/10 transition-colors"

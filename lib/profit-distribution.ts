@@ -2,7 +2,23 @@ import { supabaseAdmin } from './supabase-server'
 
 export async function distributeProfits() {
   try {
-    console.log('Starting profit distribution...')
+    console.log('Starting comprehensive profit distribution...')
+
+    // Distribute regular investment profits
+    await distributeInvestmentProfits()
+    
+    // Distribute JRC staking profits (independent of investment profits)
+    await distributeJrcStakingProfits()
+
+  } catch (error) {
+    console.error('Error in comprehensive profit distribution:', error)
+  }
+}
+
+// Function to distribute regular investment profits
+async function distributeInvestmentProfits() {
+  try {
+    console.log('Starting regular investment profit distribution...')
 
     // Get all active investment plans
     const { data: plans, error: plansError } = await supabaseAdmin
@@ -46,10 +62,9 @@ export async function distributeProfits() {
         continue
       }
 
-      // Calculate daily profit (divide by 24 for hourly distribution)
+      // Calculate daily profit (full daily amount)
       const dailyProfitRate = plan.daily_percentage / 100
-      const hourlyProfitRate = dailyProfitRate / 24
-      const profitAmount = plan.investment_amount * hourlyProfitRate
+      const profitAmount = plan.investment_amount * dailyProfitRate
 
       // Add to profit distributions
       profitDistributions.push({
@@ -66,7 +81,7 @@ export async function distributeProfits() {
         userUpdates.set(plan.user_id, profitAmount)
       }
 
-      console.log(`Calculated profit for plan ${plan.id}: $${profitAmount.toFixed(8)}`)
+      console.log(`Calculated daily profit for plan ${plan.id}: $${profitAmount.toFixed(8)}`)
     }
 
     if (profitDistributions.length === 0) {
@@ -120,7 +135,7 @@ export async function distributeProfits() {
           amount: totalProfit,
           net_amount: totalProfit,
           status: 'completed',
-          description: 'Hourly profit distribution'
+          description: 'Daily profit distribution'
         })
 
       if (transactionError) {
@@ -156,29 +171,213 @@ export async function distributeProfits() {
       }
     }
 
-    console.log(`Successfully distributed profits to ${userUpdates.size} users`)
-    console.log(`Total distributions: ${profitDistributions.length}`)
+    console.log(`Successfully distributed investment profits to ${userUpdates.size} users`)
+    console.log(`Total investment distributions: ${profitDistributions.length}`)
 
   } catch (error) {
-    console.error('Error in profit distribution:', error)
+    console.error('Error in investment profit distribution:', error)
   }
 }
 
-// Function to run profit distribution every hour
+// Function to distribute JRC staking profits
+async function distributeJrcStakingProfits() {
+  try {
+    console.log('Starting JRC staking profit distribution...')
+
+    // First check if the jrc_staking_plans table exists
+    const { data: tableCheck, error: tableError } = await supabaseAdmin
+      .from('jrc_staking_plans')
+      .select('count')
+      .limit(1)
+
+    if (tableError) {
+      console.log('JRC staking table does not exist yet. Please run the add_staking_system.sql migration first.')
+      return
+    }
+
+    // Get all active JRC staking plans
+    const { data: stakingPlans, error: stakingError } = await supabaseAdmin
+      .from('jrc_staking_plans')
+      .select('*')
+      .eq('status', 'active')
+      .gt('end_date', new Date().toISOString()) // Only plans that haven't expired yet
+
+    if (stakingError) {
+      console.error('Error fetching JRC staking plans:', stakingError)
+      return
+    }
+
+    console.log(`Found ${stakingPlans?.length || 0} JRC staking plans`)
+    
+    if (!stakingPlans || stakingPlans.length === 0) {
+      console.log('No active JRC staking plans found')
+      return
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+    const stakingDistributions = []
+    const stakingUserUpdates = new Map()
+
+    for (const plan of stakingPlans) {
+      // Check if profit already distributed today
+      const { data: existingDistribution } = await supabaseAdmin
+        .from('jrc_staking_distributions')
+        .select('id')
+        .eq('staking_plan_id', plan.id)
+        .eq('distribution_date', today)
+        .single()
+
+      if (existingDistribution) {
+        console.log(`JRC staking profit already distributed today for plan ${plan.id}`)
+        continue
+      }
+
+      // Calculate daily profit for JRC staking (in JRC coins)
+      const dailyProfitRate = plan.daily_percentage / 100
+      const profitAmount = plan.amount * dailyProfitRate
+
+      // Add to staking distributions
+      stakingDistributions.push({
+        staking_plan_id: plan.id,
+        user_id: plan.user_id,
+        profit_amount: profitAmount,
+        distribution_date: today
+      })
+
+      // Accumulate user updates (JRC coins)
+      if (stakingUserUpdates.has(plan.user_id)) {
+        stakingUserUpdates.set(plan.user_id, stakingUserUpdates.get(plan.user_id) + profitAmount)
+      } else {
+        stakingUserUpdates.set(plan.user_id, profitAmount)
+      }
+
+      console.log(`Calculated JRC staking profit for plan ${plan.id}: ${profitAmount.toFixed(2)} JRC`)
+    }
+
+    if (stakingDistributions.length === 0) {
+      console.log('No new JRC staking profits to distribute')
+      return
+    }
+
+    // Insert JRC staking distributions
+    const { error: distributionError } = await supabaseAdmin
+      .from('jrc_staking_distributions')
+      .insert(stakingDistributions)
+
+    if (distributionError) {
+      console.error('Error inserting JRC staking distributions:', distributionError)
+      return
+    }
+
+    // Update user JRC balances
+    const userIds = Array.from(stakingUserUpdates.keys())
+    for (const userId of userIds) {
+      const totalProfit = stakingUserUpdates.get(userId)!;
+      // Get current JRC balance
+      const { data: currentProfile, error: fetchError } = await supabaseAdmin
+        .from('profiles')
+        .select('total_jarvis_tokens')
+        .eq('id', userId)
+        .single()
+
+      if (fetchError) {
+        console.error(`Error fetching profile for user ${userId}:`, fetchError)
+        continue
+      }
+
+      // Update JRC balance
+      const { error: updateError } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          total_jarvis_tokens: (currentProfile.total_jarvis_tokens || 0) + totalProfit
+        })
+        .eq('id', userId)
+
+      if (updateError) {
+        console.error(`Error updating JRC balance for user ${userId}:`, updateError)
+        continue
+      }
+
+      // Create JRC profit transaction
+      const { error: transactionError } = await supabaseAdmin
+        .from('transactions')
+        .insert({
+          user_id: userId,
+          transaction_type: 'profit',
+          amount: totalProfit,
+          net_amount: totalProfit,
+          status: 'completed',
+          description: 'Daily JRC staking profit'
+        })
+
+      if (transactionError) {
+        console.error(`Error creating JRC staking transaction for user ${userId}:`, transactionError)
+      }
+
+      console.log(`Updated JRC balance for user ${userId}: +${totalProfit.toFixed(2)} JRC`)
+    }
+
+    // Update staking plans total profit earned
+    for (const distribution of stakingDistributions) {
+      // Get current total profit earned first
+      const { data: currentPlan, error: fetchPlanError } = await supabaseAdmin
+        .from('jrc_staking_plans')
+        .select('total_profit_earned')
+        .eq('id', distribution.staking_plan_id)
+        .single()
+
+      if (fetchPlanError) {
+        console.error(`Error fetching staking plan ${distribution.staking_plan_id}:`, fetchPlanError)
+        continue
+      }
+
+      const { error: planUpdateError } = await supabaseAdmin
+        .from('jrc_staking_plans')
+        .update({
+          total_profit_earned: (currentPlan.total_profit_earned || 0) + distribution.profit_amount
+        })
+        .eq('id', distribution.staking_plan_id)
+
+      if (planUpdateError) {
+        console.error(`Error updating staking plan ${distribution.staking_plan_id}:`, planUpdateError)
+      }
+    }
+
+    console.log(`Successfully distributed JRC staking profits to ${stakingUserUpdates.size} users`)
+    console.log(`Total JRC staking distributions: ${stakingDistributions.length}`)
+
+  } catch (error) {
+    console.error('Error in JRC staking profit distribution:', error)
+  }
+}
+
+// Function to run profit distribution daily
 export function startProfitDistribution() {
-  console.log('Starting automated profit distribution system...')
+  console.log('Starting automated daily profit distribution system...')
   
   // Run immediately
   distributeProfits()
   
-  // Then run every hour
+  // Then run every 24 hours (daily)
   setInterval(() => {
     distributeProfits()
-  }, 60 * 60 * 1000) // 1 hour in milliseconds
+  }, 24 * 60 * 60 * 1000) // 24 hours in milliseconds
 }
 
 // Manual trigger function for testing
 export async function triggerProfitDistribution() {
-  console.log('Manually triggering profit distribution...')
+  console.log('Manually triggering daily profit distribution...')
   await distributeProfits()
+}
+
+// Manual trigger for investment profits only
+export async function triggerInvestmentProfitDistribution() {
+  console.log('Manually triggering investment profit distribution...')
+  await distributeInvestmentProfits()
+}
+
+// Manual trigger for JRC staking profits only
+export async function triggerJrcStakingProfitDistribution() {
+  console.log('Manually triggering JRC staking profit distribution...')
+  await distributeJrcStakingProfits()
 }

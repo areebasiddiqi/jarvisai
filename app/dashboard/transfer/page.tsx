@@ -90,25 +90,15 @@ export default function TransferPage() {
 
         if (updateError) throw updateError
 
-        // Create transaction records
-        await supabase.from('transactions').insert([
-          {
-            user_id: user?.id,
-            transaction_type: 'withdrawal',
-            amount: transferAmount,
-            net_amount: transferAmount,
-            status: 'completed',
-            description: 'Transfer from Main to Fund Wallet'
-          },
-          {
-            user_id: user?.id,
-            transaction_type: 'deposit',
-            amount: transferAmount,
-            net_amount: transferAmount,
-            status: 'completed',
-            description: 'Transfer from Main to Fund Wallet'
-          }
-        ])
+        // Create transaction record
+        await supabase.from('transactions').insert({
+          user_id: user?.id,
+          transaction_type: 'wallet_transfer',
+          amount: transferAmount,
+          net_amount: transferAmount,
+          status: 'completed',
+          description: 'Transfer from Main to Fund Wallet'
+        })
 
         setSuccess(`Successfully transferred $${transferAmount} from Main Wallet to Fund Wallet`)
         setProfile(prev => prev ? {
@@ -182,7 +172,7 @@ export default function TransferPage() {
         await supabase.from('transactions').insert([
           {
             user_id: user?.id,
-            transaction_type: 'withdrawal',
+            transaction_type: 'transfer_sent',
             amount: transferAmount,
             net_amount: transferAmount,
             status: 'completed',
@@ -190,7 +180,7 @@ export default function TransferPage() {
           },
           {
             user_id: receiver.id,
-            transaction_type: 'deposit',
+            transaction_type: 'transfer_received',
             amount: transferAmount,
             net_amount: transferAmount,
             status: 'completed',

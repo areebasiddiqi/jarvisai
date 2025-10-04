@@ -264,45 +264,45 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen jarvis-gradient">
       {/* Header */}
-      <header className="border-b border-white/20 p-4">
+      <header className="border-b border-white/20 p-3 sm:p-4">
         <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Bot className="h-8 w-8 text-white" />
-              <span className="text-2xl font-bold text-white">Jarvis AI</span>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+              <span className="text-lg sm:text-2xl font-bold text-white">Jarvis AI</span>
             </div>
-            <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            <div className="bg-orange-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold">
               Big Day 2024
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="text-white text-right">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="text-white text-right hidden sm:block">
               <p className="text-sm text-gray-300">Welcome back</p>
               <p className="font-semibold">{profile.full_name}</p>
               <p className="text-xs text-blue-300">User ID: {profile.referral_code}</p>
             </div>
-            <div className="flex items-center space-x-2">
-              <button className="p-2 text-white hover:bg-white/10 rounded-full">
-                <Send className="h-5 w-5" />
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <button className="p-1.5 sm:p-2 text-white hover:bg-white/10 rounded-full">
+                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
-              <button className="p-2 text-white hover:bg-white/10 rounded-full">
-                <MessageCircle className="h-5 w-5" />
+              <button className="p-1.5 sm:p-2 text-white hover:bg-white/10 rounded-full">
+                <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-3 sm:p-4">
         {/* Total Income Card */}
-        <div className="jarvis-card rounded-2xl p-6 mb-6">
+        <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-4xl font-bold text-white">${profile.main_wallet_balance.toFixed(2)}</h2>
-              <p className="text-gray-300">Total Income</p>
+              <h2 className="text-2xl sm:text-4xl font-bold text-white">${profile.main_wallet_balance.toFixed(2)}</h2>
+              <p className="text-gray-300 text-sm sm:text-base">Total Income</p>
             </div>
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <div className="flex items-center space-x-2">
                 <Bot className="h-8 w-8 text-white" />
                 <span className="text-xl font-bold text-white">Jarvis AI</span>
@@ -315,37 +315,37 @@ export default function DashboardPage() {
         </div>
 
         {/* Staking Notice */}
-        <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-4 mb-6 overflow-hidden">
+        <div className="bg-blue-600/20 border border-blue-500 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 overflow-hidden">
           <div className="whitespace-nowrap animate-marquee">
-            <p className="text-white inline-block"> Staking has started from $50 • Earn daily profits with BSC integration • Referral commissions up to 10 levels •</p>
+            <p className="text-white inline-block">Staking Started from 1 USDT: Earn 2% to 5% daily on USDT and JRC. Referral Commission up to 10 Levels</p>
           </div>
         </div>
 
         {/* Wallet Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="jarvis-card rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-6">
+          <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                  <Wallet className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-full flex items-center justify-center">
+                  <Wallet className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">Main Wallet</h3>
-                  <p className="text-gray-300 text-sm">${profile.main_wallet_balance.toFixed(2)}</p>
+                  <h3 className="text-white font-semibold text-sm sm:text-base">Main Wallet</h3>
+                  <p className="text-gray-300 text-xs sm:text-sm">${profile.main_wallet_balance.toFixed(2)}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="jarvis-card rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-                  <Wallet className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-full flex items-center justify-center">
+                  <Wallet className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">Fund Wallet</h3>
-                  <p className="text-gray-300 text-sm">${profile.fund_wallet_balance.toFixed(2)}</p>
+                  <h3 className="text-white font-semibold text-sm sm:text-base">Fund Wallet</h3>
+                  <p className="text-gray-300 text-xs sm:text-sm">${profile.fund_wallet_balance.toFixed(2)}</p>
                 </div>
               </div>
             </div>
@@ -353,18 +353,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Jarvis Tokens Card */}
-        <div className="jarvis-card rounded-2xl p-6 mb-6">
+        <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <Coins className="h-8 w-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Coins className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
               <div>
-                <h3 className="text-white font-semibold">Jarvis Coins</h3>
-                <p className="text-2xl font-bold text-yellow-400">{profile.total_jarvis_tokens.toLocaleString()} JRC</p>
+                <h3 className="text-white font-semibold text-sm sm:text-base">Jarvis Coins</h3>
+                <p className="text-lg sm:text-2xl font-bold text-yellow-400">{profile.total_jarvis_tokens.toLocaleString()} JRC</p>
                 <button 
                   onClick={() => setShowJrcModal(true)}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-full text-sm font-semibold mt-2 transition-colors"
+                  className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 sm:px-4 rounded-full text-xs sm:text-sm font-semibold mt-2 transition-colors"
                 >
                   BUY JRC
                 </button>
@@ -374,185 +374,150 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <Link href="/dashboard/deposit" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <ArrowUpRight className="h-8 w-8 text-red-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Deposit</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <Link href="/dashboard/deposit" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <ArrowUpRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">Deposit</p>
           </Link>
 
-          <Link href="/dashboard/invest" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <TrendingUp className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Stake USDT</p>
+          <Link href="/dashboard/invest" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">Stake USDT</p>
           </Link>
 
-          <Link href="/dashboard/transfer" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <Send className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Transfer</p>
+          <Link href="/dashboard/transfer" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <Send className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">Transfer</p>
           </Link>
 
-          <Link href="/dashboard/withdraw" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <ArrowDownLeft className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Withdraw</p>
+          <Link href="/dashboard/withdraw" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <ArrowDownLeft className="h-6 w-6 sm:h-8 sm:w-8 text-green-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">Withdraw</p>
           </Link>
 
-          <Link href="/dashboard/staking" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <Coins className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Staking</p>
+          <Link href="/dashboard/bnx-staking" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <Coins className="h-6 w-6 sm:h-8 sm:w-8 text-orange-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">JRC Staking</p>
           </Link>
 
-          <Link href="/dashboard/bnx-staking" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <Coins className="h-8 w-8 text-orange-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">JRV Staking</p>
-          </Link>
-
-          <Link href="/dashboard/referral" className="jarvis-card rounded-2xl p-6 text-center hover:scale-105 transition-transform">
-            <Users className="h-8 w-8 text-pink-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">Refer Link</p>
+          <Link href="/dashboard/referral" className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:scale-105 transition-transform">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-pink-400 mx-auto mb-2" />
+            <p className="text-white font-semibold text-xs sm:text-sm">Refer Link</p>
           </Link>
         </div>
 
         {/* Income Tracking */}
-        <div className="space-y-4 mb-6">
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Coins className="h-6 w-6 text-yellow-400" />
+        <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+
+          <div className="jarvis-card rounded-xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" />
               <div>
-                <p className="text-white font-semibold">Sign Up Token</p>
+                <p className="text-white font-semibold text-sm sm:text-base">JRC Referral Coin</p>
                 <button 
                   onClick={() => handleViewIncome('tokens')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
+                  className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
                 >
                   VIEW
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold">100 JRV</p>
+            <p className="text-white font-bold text-sm sm:text-base">0 JRC</p>
           </div>
 
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Coins className="h-6 w-6 text-yellow-400" />
+          <div className="jarvis-card rounded-xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
               <div>
-                <p className="text-white font-semibold">JRV Referral Token</p>
-                <button 
-                  onClick={() => handleViewIncome('tokens')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
-                >
-                  VIEW
-                </button>
-              </div>
-            </div>
-            <p className="text-white font-bold">0 JRV</p>
-          </div>
-
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <TrendingUp className="h-6 w-6 text-green-400" />
-              <div>
-                <p className="text-white font-semibold">Trade Income</p>
+                <p className="text-white font-semibold text-sm sm:text-base">Trade Income</p>
                 <button 
                   onClick={() => handleViewIncome('trade')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
+                  className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
                 >
                   VIEW
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold">${totalProfits.toFixed(2)}</p>
+            <p className="text-white font-bold text-sm sm:text-base">${totalProfits.toFixed(2)}</p>
           </div>
 
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Users className="h-6 w-6 text-purple-400" />
+          <div className="jarvis-card rounded-xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
               <div>
-                <p className="text-white font-semibold">Level Income</p>
+                <p className="text-white font-semibold text-sm sm:text-base">Referral Income</p>
                 <button 
                   onClick={() => handleViewIncome('referral')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
+                  className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
                 >
                   VIEW
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold">$0</p>
+            <p className="text-white font-bold text-sm sm:text-base">$0</p>
           </div>
 
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Gift className="h-6 w-6 text-pink-400" />
-              <div>
-                <p className="text-white font-semibold">Reward Income</p>
-                <button 
-                  onClick={() => handleViewIncome('rewards')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
-                >
-                  VIEW
-                </button>
-              </div>
-            </div>
-            <p className="text-white font-bold">$0</p>
-          </div>
 
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Coins className="h-6 w-6 text-blue-400" />
+          <div className="jarvis-card rounded-xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
               <div>
-                <p className="text-white font-semibold">Staking Income</p>
+                <p className="text-white font-semibold text-sm sm:text-base">Staking Income</p>
                 <button 
                   onClick={() => handleViewIncome('staking')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
+                  className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
                 >
                   VIEW
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold">$0</p>
+            <p className="text-white font-bold text-sm sm:text-base">$0</p>
           </div>
 
-          <div className="jarvis-card rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Users className="h-6 w-6 text-orange-400" />
+          <div className="jarvis-card rounded-xl p-3 sm:p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-orange-400" />
               <div>
-                <p className="text-white font-semibold">Staking Referral Income</p>
+                <p className="text-white font-semibold text-sm sm:text-base">Staking Referral Income</p>
                 <button 
                   onClick={() => handleViewIncome('staking-referral')}
-                  className="text-blue-400 text-sm hover:text-blue-300"
+                  className="text-blue-400 text-xs sm:text-sm hover:text-blue-300"
                 >
                   VIEW
                 </button>
               </div>
             </div>
-            <p className="text-white font-bold">$0</p>
+            <p className="text-white font-bold text-sm sm:text-base">$0</p>
           </div>
         </div>
 
         {/* Team & Investment Info */}
-        <div className="jarvis-card rounded-2xl p-6 mb-6">
-          <h3 className="text-white font-bold text-lg mb-4">Team & Investment Info</h3>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-4">
+        <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6">
+          <h3 className="text-white font-bold text-base sm:text-lg mb-3 sm:mb-4">Team & Investment Info</h3>
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
+            <div className="space-y-3 sm:space-y-4">
               <div className="text-center">
-                <p className="text-gray-300 text-sm">My Investment</p>
-                <p className="text-2xl font-bold text-white">${totalInvestment.toFixed(2)}</p>
+                <p className="text-gray-300 text-xs sm:text-sm">My Investment</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">${totalInvestment.toFixed(2)}</p>
               </div>
               <div className="text-center">
-                <p className="text-gray-300 text-sm">My Referrals</p>
-                <p className="text-2xl font-bold text-white">0</p>
+                <p className="text-gray-300 text-xs sm:text-sm">My Referrals</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">0</p>
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="text-center">
-                <p className="text-gray-300 text-sm">Team Investment</p>
-                <p className="text-2xl font-bold text-white">$0</p>
+                <p className="text-gray-300 text-xs sm:text-sm">Team Investment</p>
+                <p className="text-lg sm:text-2xl font-bold text-white">$0</p>
               </div>
               <div className="space-y-2">
                 <div className="text-center">
-                  <p className="text-gray-300 text-sm">Staking Progress</p>
-                  <p className="text-2xl font-bold text-white">$0</p>
+                  <p className="text-gray-300 text-xs sm:text-sm">Staking Progress</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">$0</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-gray-300 text-sm">Jarvis Staking</p>
-                  <p className="text-2xl font-bold text-white">0 JRV</p>
+                  <p className="text-gray-300 text-xs sm:text-sm">Jarvis Staking</p>
+                  <p className="text-lg sm:text-2xl font-bold text-white">0 JRC</p>
                 </div>
               </div>
             </div>
@@ -565,10 +530,10 @@ export default function DashboardPage() {
 
       {/* Income Details Modal */}
       {showIncomeModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="jarvis-card rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 sm:p-4 z-50">
+          <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl w-full max-h-[85vh] sm:max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-2xl font-bold text-white">
                 {selectedIncomeType === 'trade' && 'Trade Income Details'}
                 {selectedIncomeType === 'referral' && 'Referral Commission Details'}
                 {selectedIncomeType === 'tokens' && 'Token Transaction Details'}
@@ -580,20 +545,20 @@ export default function DashboardPage() {
                 onClick={() => setShowIncomeModal(false)}
                 className="text-gray-400 hover:text-white"
               >
-                <XCircle className="h-6 w-6" />
+                <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {incomeData.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-300">No data available for this income type</p>
+                <div className="text-center py-6 sm:py-8">
+                  <p className="text-gray-300 text-sm sm:text-base">No data available for this income type</p>
                 </div>
               ) : (
                 incomeData.map((item, index) => (
-                  <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div key={index} className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10">
                     {selectedIncomeType === 'trade' && (
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
                           <p className="text-gray-400">Plan Type</p>
                           <p className="text-white font-semibold">Plan {item.plan_type}</p>
@@ -614,7 +579,7 @@ export default function DashboardPage() {
                     )}
                     
                     {selectedIncomeType === 'referral' && (
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
                           <p className="text-gray-400">Commission Amount</p>
                           <p className="text-white font-semibold">${item.commission_amount?.toFixed(2)}</p>
@@ -635,14 +600,14 @@ export default function DashboardPage() {
                     )}
                     
                     {selectedIncomeType === 'tokens' && (
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div>
                           <p className="text-gray-400">Transaction Type</p>
                           <p className="text-white font-semibold capitalize">{item.transaction_type?.replace('_', ' ')}</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Amount</p>
-                          <p className="text-yellow-400">{item.amount} JRV</p>
+                          <p className="text-yellow-400">{item.amount} JRC</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Status</p>
@@ -664,12 +629,12 @@ export default function DashboardPage() {
 
       {/* JRC Purchase Modal */}
       {showJrcModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="jarvis-card rounded-2xl p-6 max-w-md w-full">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white flex items-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-3">
-                  <Coins className="h-4 w-4 text-white" />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 sm:p-4 z-50">
+          <div className="jarvis-card rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-2xl font-bold text-white flex items-center">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                  <Coins className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
                 Buy JRC Coins
               </h3>
@@ -682,41 +647,41 @@ export default function DashboardPage() {
                 }}
                 className="text-gray-400 hover:text-white"
               >
-                <XCircle className="h-6 w-6" />
+                <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
 
             {/* Current Rate */}
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
               <div className="text-center">
-                <p className="text-blue-400 font-semibold">Current Rate</p>
-                <p className="text-2xl font-bold text-white">$0.10 per JRC</p>
-                <p className="text-gray-300 text-sm">1 JRC = $0.10 USDT</p>
+                <p className="text-blue-400 font-semibold text-sm sm:text-base">Current Rate</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">$0.10 per JRC</p>
+                <p className="text-gray-300 text-xs sm:text-sm">1 JRC = $0.10 USDT</p>
               </div>
             </div>
 
             {/* Available Balance */}
-            <div className="bg-green-500/10 rounded-lg p-3 mb-4">
-              <p className="text-gray-300 text-sm">Available Fund Wallet Balance</p>
-              <p className="text-xl font-bold text-green-400">${profile?.fund_wallet_balance?.toFixed(2) || '0.00'}</p>
+            <div className="bg-green-500/10 rounded-lg p-3 mb-3 sm:mb-4">
+              <p className="text-gray-300 text-xs sm:text-sm">Available Fund Wallet Balance</p>
+              <p className="text-lg sm:text-xl font-bold text-green-400">${profile?.fund_wallet_balance?.toFixed(2) || '0.00'}</p>
             </div>
 
             {jrcError && (
-              <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4">
+              <div className="bg-red-500/20 border border-red-500 text-red-200 px-3 py-2 sm:px-4 sm:py-3 rounded-lg mb-3 sm:mb-4 text-sm">
                 {jrcError}
               </div>
             )}
 
             {jrcSuccess && (
-              <div className="bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg mb-4">
+              <div className="bg-green-500/20 border border-green-500 text-green-200 px-3 py-2 sm:px-4 sm:py-3 rounded-lg mb-3 sm:mb-4 text-sm">
                 {jrcSuccess}
               </div>
             )}
 
             {/* Purchase Form */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-white text-sm font-medium mb-2">
+                <label className="block text-white text-xs sm:text-sm font-medium mb-2">
                   JRC Coins to Purchase
                 </label>
                 <input
@@ -726,22 +691,22 @@ export default function DashboardPage() {
                   placeholder="Enter amount of JRC coins"
                   min="1"
                   step="1"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
                 />
                 {jrcAmount && (
-                  <p className="text-gray-300 text-sm mt-2">
+                  <p className="text-gray-300 text-xs sm:text-sm mt-2">
                     Total Cost: ${(parseFloat(jrcAmount) * 0.1).toFixed(2)} USDT
                   </p>
                 )}
               </div>
 
               {/* Quick Amount Buttons */}
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[100, 500, 1000, 5000].map((amount) => (
                   <button
                     key={amount}
                     onClick={() => setJrcAmount(amount.toString())}
-                    className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors"
+                    className="px-2 py-1.5 sm:px-3 sm:py-2 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm rounded-lg transition-colors"
                   >
                     {amount.toLocaleString()}
                   </button>
@@ -752,16 +717,16 @@ export default function DashboardPage() {
               <button
                 onClick={handleJrcPurchase}
                 disabled={jrcPurchasing || !jrcAmount || parseFloat(jrcAmount) <= 0}
-                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed py-3 rounded-lg text-white font-semibold transition-colors"
+                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed py-2.5 sm:py-3 rounded-lg text-white font-semibold transition-colors text-sm sm:text-base"
               >
                 {jrcPurchasing ? 'Processing...' : 'Purchase JRC Coins'}
               </button>
             </div>
 
             {/* Purchase Info */}
-            <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-              <h4 className="text-yellow-400 font-semibold mb-2">Purchase Information</h4>
-              <ul className="text-yellow-200 text-sm space-y-1">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+              <h4 className="text-yellow-400 font-semibold mb-2 text-sm sm:text-base">Purchase Information</h4>
+              <ul className="text-yellow-200 text-xs sm:text-sm space-y-1">
                 <li>• Tokens are purchased instantly</li>
                 <li>• Funds are deducted from your Fund Wallet</li>
                 <li>• JRC coins are added to your coin balance</li>

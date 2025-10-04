@@ -260,9 +260,9 @@ export default function ProfilePage() {
             {/* Jarvis Tokens Display */}
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-4">
               <div className="flex justify-between items-center">
-                <span className="text-white font-medium">Total Jarvis Tokens</span>
+                <span className="text-white font-medium">Total Jarvis Coins</span>
                 <span className="text-yellow-400 font-bold text-lg">
-                  {profile?.total_jarvis_tokens.toLocaleString() || 0} JRV
+                  {profile?.total_jarvis_tokens.toLocaleString() || 0} JRC
                 </span>
               </div>
             </div>

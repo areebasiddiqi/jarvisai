@@ -157,32 +157,10 @@ export default function InvestHistoryPage() {
 
           <div className="jarvis-card rounded-xl p-4">
             <div className="flex items-center space-x-3">
-              <TrendingUp className="h-8 w-8 text-green-400" />
-              <div>
-                <p className="text-gray-300 text-sm">Total Profit</p>
-                <p className="text-xl font-bold text-white">${totalProfit.toFixed(2)}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="jarvis-card rounded-xl p-4">
-            <div className="flex items-center space-x-3">
               <Target className="h-8 w-8 text-yellow-400" />
               <div>
                 <p className="text-gray-300 text-sm">Active Plans</p>
                 <p className="text-xl font-bold text-white">{activeInvestments}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="jarvis-card rounded-xl p-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JRV</span>
-              </div>
-              <div>
-                <p className="text-gray-300 text-sm">Tokens Earned</p>
-                <p className="text-xl font-bold text-white">{totalTokensEarned.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -272,7 +250,7 @@ export default function InvestHistoryPage() {
                           <p className="text-green-400 font-semibold">${(investment.total_profit_earned || 0).toFixed(2)}</p>
                         </div>
                         <div>
-                          <p className="text-gray-400">JRV Tokens</p>
+                          <p className="text-gray-400">JRC Coins</p>
                           <p className="text-yellow-400 font-semibold">{(investment.jarvis_tokens_earned || 0).toLocaleString()}</p>
                         </div>
                         <div>

@@ -8,7 +8,7 @@ import { ArrowLeft, Coins, Calendar, Clock, TrendingUp, CheckCircle, XCircle } f
 import Link from 'next/link'
 import DockNavbar from '@/components/DockNavbar'
 
-interface JRVStakingRecord {
+interface JRCStakingRecord {
   id: string
   user_id: string
   amount: number
@@ -22,10 +22,10 @@ interface JRVStakingRecord {
   rewards_claimed: number
 }
 
-export default function JRVStakingHistoryPage() {
+export default function JRCStakingHistoryPage() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
-  const [stakingRecords, setStakingRecords] = useState<JRVStakingRecord[]>([])
+  const [stakingRecords, setStakingRecords] = useState<JRCStakingRecord[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'withdrawn'>('all')
   const supabase = createSupabaseClient()
@@ -38,23 +38,23 @@ export default function JRVStakingHistoryPage() {
 
   useEffect(() => {
     if (user) {
-      fetchJRVStakingHistory()
+      fetchJRCStakingHistory()
     }
   }, [user])
 
-  const fetchJRVStakingHistory = async () => {
+  const fetchJRCStakingHistory = async () => {
     try {
-      // For now, we'll fetch from transactions table where description contains 'JRV Staking'
+      // For now, we'll fetch from transactions table where description contains 'JRC Staking'
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', user?.id)
-        .ilike('description', '%JRV%staking%')
+        .ilike('description', '%JRC%staking%')
         .order('created_at', { ascending: false })
 
       if (error) throw error
       
-      // Transform transaction data to JRV staking records format
+      // Transform transaction data to JRC staking records format
       const transformedData = (data || []).map(transaction => ({
         id: transaction.id,
         user_id: transaction.user_id,
@@ -71,7 +71,7 @@ export default function JRVStakingHistoryPage() {
 
       setStakingRecords(transformedData)
     } catch (error) {
-      console.error('Error fetching JRV staking history:', error)
+      console.error('Error fetching JRC staking history:', error)
     } finally {
       setLoadingData(false)
     }
@@ -163,7 +163,7 @@ export default function JRVStakingHistoryPage() {
           <Link href="/dashboard/bnx-staking" className="text-white hover:text-blue-300">
             <ArrowLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-xl font-bold text-white">JRV Staking History</h1>
+          <h1 className="text-xl font-bold text-white">JRC Staking History</h1>
           <div></div>
         </div>
       </header>

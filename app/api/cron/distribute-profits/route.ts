@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Hourly profit distribution completed',
+      message: 'Daily profit distribution completed',
       timestamp: new Date().toISOString()
     })
 

@@ -161,8 +161,8 @@ export default function InvestmentsManagement() {
 
     if (searchTerm) {
       filtered = filtered.filter(inv => 
-        inv.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.user_email.toLowerCase().includes(searchTerm.toLowerCase())
+        (inv.username?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (inv.user_email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       )
     }
 
