@@ -15,7 +15,9 @@ import {
   XCircle,
   Eye,
   Wallet,
-  TrendingUp
+  TrendingUp,
+  Plus,
+  DollarSign
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -47,6 +49,11 @@ export default function UsersManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false)
+  const [addFundsUser, setAddFundsUser] = useState<UserProfile | null>(null)
+  const [addFundsAmount, setAddFundsAmount] = useState('')
+  const [addFundsNotes, setAddFundsNotes] = useState('')
+  const [isAddingFunds, setIsAddingFunds] = useState(false)
   const supabase = createSupabaseClient()
 
   useEffect(() => {
@@ -204,6 +211,63 @@ export default function UsersManagement() {
     setShowUserModal(true)
   }
 
+  const openAddFundsModal = (user: UserProfile) => {
+    setAddFundsUser(user)
+    setAddFundsAmount('')
+    setAddFundsNotes('')
+    setShowAddFundsModal(true)
+  }
+
+  const closeAddFundsModal = () => {
+    setShowAddFundsModal(false)
+    setAddFundsUser(null)
+    setAddFundsAmount('')
+    setAddFundsNotes('')
+  }
+
+  const handleAddFunds = async () => {
+    if (!addFundsUser || !addFundsAmount) {
+      alert('Please enter an amount')
+      return
+    }
+
+    const amount = parseFloat(addFundsAmount)
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid positive amount')
+      return
+    }
+
+    setIsAddingFunds(true)
+    try {
+      const response = await fetch('/api/admin/add-funds', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: addFundsUser.id,
+          amount: amount,
+          adminNotes: addFundsNotes || `Manual fund addition of $${amount} by admin`
+        }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        alert(`Successfully added $${amount} to ${addFundsUser.username}'s wallet!`)
+        closeAddFundsModal()
+        await fetchUsers() // Refresh the users list
+      } else {
+        alert(`Failed to add funds: ${result.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error adding funds:', error)
+      alert('Failed to add funds. Please try again.')
+    } finally {
+      setIsAddingFunds(false)
+    }
+  }
+
   if (loading || isLoading) {
     return (
       <div className="min-h-screen jarvis-gradient flex items-center justify-center">
@@ -348,6 +412,14 @@ export default function UsersManagement() {
                         <span>View</span>
                       </button>
                       
+                      <button
+                        onClick={() => openAddFundsModal(userProfile)}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center space-x-1"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>Add Funds</span>
+                      </button>
+                      
                       {!userProfile.is_admin && (
                         <>
                           {userProfile.is_banned ? (
@@ -472,6 +544,95 @@ export default function UsersManagement() {
                   <p className="text-gray-400 text-sm">Referrals</p>
                   <p className="text-xl font-bold text-blue-400">{selectedUser.referral_count}</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Funds Modal */}
+      {showAddFundsModal && addFundsUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="jarvis-card rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-white">Add Funds</h3>
+              <button
+                onClick={closeAddFundsModal}
+                className="text-gray-400 hover:text-white"
+                disabled={isAddingFunds}
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-gray-400 text-sm mb-2">User</p>
+                <div className="bg-white/5 rounded-lg p-3">
+                  <p className="text-white font-semibold">{addFundsUser.username}</p>
+                  <p className="text-gray-400 text-sm">{addFundsUser.user_email}</p>
+                  <p className="text-gray-400 text-sm">Current Balance: ${addFundsUser.main_wallet_balance.toFixed(2)}</p>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">
+                  Amount to Add ($)
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="0.00"
+                    value={addFundsAmount}
+                    onChange={(e) => setAddFundsAmount(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    disabled={isAddingFunds}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">
+                  Admin Notes (Optional)
+                </label>
+                <textarea
+                  placeholder="Reason for adding funds..."
+                  value={addFundsNotes}
+                  onChange={(e) => setAddFundsNotes(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  disabled={isAddingFunds}
+                />
+              </div>
+              
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={closeAddFundsModal}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg font-semibold"
+                  disabled={isAddingFunds}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddFunds}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center space-x-2"
+                  disabled={isAddingFunds || !addFundsAmount}
+                >
+                  {isAddingFunds ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-5 w-5" />
+                      <span>Add Funds</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
