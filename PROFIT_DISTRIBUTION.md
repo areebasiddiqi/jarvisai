@@ -26,24 +26,41 @@ The Jarvis Staking platform includes a profit distribution system that distribut
 - Database tables are created (`profit_distributions`)
 - Manual trigger via admin dashboard
 - API endpoints for profit distribution
-- On-demand profit distribution (no automated scheduling)
+- **Automatic profit distribution** running at configurable intervals
+- Server auto-initialization on startup
 
-## Manual Profit Distribution
+## Automatic Profit Distribution
 
-The system now operates on-demand rather than automated scheduling. Profits are distributed when:
+The system now runs automatically in the background. Profits are distributed:
 
-1. **Admin manually triggers** distribution via the admin dashboard
-2. **API calls** are made to the distribution endpoints
+1. **Automatically** at configurable intervals (default: 1 minute for testing)
+2. **On server startup** - initializes automatically when the app loads
 3. **24-hour rule applies**: Only plans created 24+ hours ago will receive profits
+4. **Manual trigger available** via admin dashboard or API
 
-### Triggering Distribution
+### Configuration
+
+Set the distribution interval in your `.env.local` file:
+
+```env
+# Profit Distribution Interval (in minutes)
+PROFIT_DISTRIBUTION_INTERVAL=1    # For testing (every minute)
+# PROFIT_DISTRIBUTION_INTERVAL=60   # For production (every hour)
+# PROFIT_DISTRIBUTION_INTERVAL=1440 # For production (every 24 hours)
+```
+
+### Manual Triggering (Optional)
 - **Admin Dashboard**: Login as admin → Go to `/admin` → Click "Distribute Profits"
 - **API Endpoint**: `POST /api/admin/distribute-profits` (requires admin auth)
+- **Start/Restart**: `GET /api/init` or `POST /api/profit-distribution/start`
 
-## No Automated Scheduling
-- **Removed**: Cronjob configuration and automated intervals
-- **Benefit**: More control over when profits are distributed
-- **24-Hour Safety**: Users cannot receive profits until 24 hours after investing
+## How Automatic Distribution Works
+1. **Server Starts**: App initializes and calls `/api/init`
+2. **Interval Set**: System starts running every X minutes (configurable)
+3. **Checks Plans**: Every interval, checks all active investment plans
+4. **24-Hour Check**: Only processes plans older than 24 hours
+5. **Distributes Profits**: Adds daily profits to user wallets
+6. **Prevents Duplicates**: Won't distribute twice in the same day
 
 ## Manual Testing
 

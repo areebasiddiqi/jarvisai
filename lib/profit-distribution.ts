@@ -52,9 +52,9 @@ async function distributeInvestmentProfits() {
       // Check if 24 hours have passed since plan creation
       const planCreatedAt = new Date(plan.created_at)
       const now = new Date()
-      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60 * 60)
+      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60)
       
-      if (hoursSinceCreation < 24) {
+      if (hoursSinceCreation < 1) {
         console.log(`Plan ${plan.id} created ${hoursSinceCreation.toFixed(2)} hours ago, needs to wait 24 hours`)
         continue
       }
@@ -232,9 +232,9 @@ async function distributeJrcStakingProfits() {
       // Check if 24 hours have passed since staking plan creation
       const planCreatedAt = new Date(plan.created_at)
       const now = new Date()
-      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60 * 60)
+      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60)
       
-      if (hoursSinceCreation < 24) {
+      if (hoursSinceCreation < 1) {
         console.log(`Staking plan ${plan.id} created ${hoursSinceCreation.toFixed(2)} hours ago, needs to wait 24 hours`)
         continue
       }
@@ -371,11 +371,45 @@ async function distributeJrcStakingProfits() {
   }
 }
 
-// Function to run profit distribution on-demand (no longer automated)
-// This function is kept for backward compatibility but no longer sets up intervals
-export function startProfitDistribution() {
-  console.log('Profit distribution is now on-demand only. Use admin panel or API to trigger.')
+// Global variable to store the interval ID
+let distributionInterval: NodeJS.Timeout | null = null
+
+// Function to run profit distribution automatically at specified intervals
+export function startProfitDistribution(intervalMinutes: number = 60) {
+  console.log(`Starting automated profit distribution system (every ${intervalMinutes} minutes)...`)
   console.log('Users will receive profits 24 hours after investing in a plan.')
+  
+  // Clear any existing interval
+  if (distributionInterval) {
+    clearInterval(distributionInterval)
+  }
+  
+  // Run immediately on start
+  distributeProfits().catch(error => {
+    console.error('Error in initial profit distribution:', error)
+  })
+  
+  // Then run at specified intervals
+  distributionInterval = setInterval(() => {
+    distributeProfits().catch(error => {
+      console.error('Error in scheduled profit distribution:', error)
+    })
+  }, intervalMinutes * 60 * 1000) // Convert minutes to milliseconds
+  
+  console.log(`Profit distribution interval set to ${intervalMinutes} minutes`)
+  return distributionInterval
+}
+
+// Function to stop automatic profit distribution
+export function stopProfitDistribution() {
+  if (distributionInterval) {
+    clearInterval(distributionInterval)
+    distributionInterval = null
+    console.log('Automatic profit distribution stopped')
+    return true
+  }
+  console.log('No active profit distribution to stop')
+  return false
 }
 
 // Manual trigger function for testing

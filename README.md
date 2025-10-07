@@ -86,6 +86,9 @@ A comprehensive cryptocurrency investment platform built with Next.js, Supabase,
    
    # App Configuration
    NEXT_PUBLIC_APP_URL=http://localhost:3000
+   
+   # Profit Distribution (in minutes)
+   PROFIT_DISTRIBUTION_INTERVAL=1    # 1 minute for testing, 60 for production
    ```
 
 5. **Run the development server**

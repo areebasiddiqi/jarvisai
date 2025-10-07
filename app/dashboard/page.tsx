@@ -301,16 +301,25 @@ export default function DashboardPage() {
               <Image 
                 src="/logo_300x300.png" 
                 alt="Jarvis Staking Logo" 
-                width={48} 
-                height={48} 
-                className="h-8 w-8 sm:h-12 sm:w-12"
+                width={128} 
+                height={128} 
+                className="!h-24 !w-24 sm:!h-32 sm:!w-32"
+                style={{ width: '96px', height: '96px' }}
                 priority
                 unoptimized={process.env.NODE_ENV === 'development'}
               />
               <span className="text-lg sm:text-2xl font-bold text-white">Jarvis Staking</span>
             </div>
-            <div className="bg-orange-500 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold">
-              Big Day 2024
+            <div className="flex items-center">
+              <Image 
+                src="/logo_300x300.png" 
+                alt="Jarvis Staking Logo" 
+                width={64} 
+                height={64} 
+                className="!h-12 !w-12 sm:!h-16 sm:!w-16"
+                style={{ width: '48px', height: '48px' }}
+                unoptimized={process.env.NODE_ENV === 'development'}
+              />
             </div>
           </div>
           
@@ -363,18 +372,18 @@ export default function DashboardPage() {
             <div className="text-right hidden sm:block">
               <div className="flex items-center space-x-2">
                 <Image 
-                  src="/logo_300x300.png" 
-                  alt="Jarvis Staking Logo" 
-                  width={48} 
-                  height={48} 
-                  className="h-12 w-12"
-                  unoptimized={process.env.NODE_ENV === 'development'}
+                src="/logo_300x300.png" 
+                alt="Jarvis Staking Logo" 
+                width={128} 
+                height={128} 
+                className="!h-24 !w-24 sm:!h-32 sm:!w-32"
+                style={{ width: '96px', height: '96px' }}
+                priority
+                unoptimized={process.env.NODE_ENV === 'development'}
                 />
                 <span className="text-xl font-bold text-white">Jarvis Staking</span>
               </div>
-              <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold mt-2">
-                Big Day 2024
-              </div>
+
             </div>
           </div>
         </div>

@@ -42,13 +42,14 @@ export default function HomePage() {
       {/* Header */}
       <header className="relative z-10 container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <Image 
               src="/logo_300x300.png" 
               alt="Jarvis Staking Logo" 
-              width={64} 
-              height={64} 
-              className="w-16 h-16"
+              width={128} 
+              height={128} 
+              className="!w-32 !h-32"
+              style={{ width: '128px', height: '128px' }}
               priority
               unoptimized={process.env.NODE_ENV === 'development'}
             />
