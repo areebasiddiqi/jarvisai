@@ -96,11 +96,11 @@ export default function SignUpPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6">
             <Image 
-              src="/logo_32x32.png" 
+              src="/logo_300x300.png" 
               alt="Jarvis Staking Logo" 
-              width={32} 
-              height={32} 
-              className="h-8 w-8"
+              width={48} 
+              height={48} 
+              className="h-12 w-12"
               priority
               unoptimized={process.env.NODE_ENV === 'development'}
             />

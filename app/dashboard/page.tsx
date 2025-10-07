@@ -299,11 +299,11 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="flex items-center space-x-1 sm:space-x-2">
               <Image 
-                src="/logo_32x32.png" 
+                src="/logo_300x300.png" 
                 alt="Jarvis Staking Logo" 
-                width={32} 
-                height={32} 
-                className="h-6 w-6 sm:h-8 sm:w-8"
+                width={48} 
+                height={48} 
+                className="h-8 w-8 sm:h-12 sm:w-12"
                 priority
                 unoptimized={process.env.NODE_ENV === 'development'}
               />
@@ -363,11 +363,11 @@ export default function DashboardPage() {
             <div className="text-right hidden sm:block">
               <div className="flex items-center space-x-2">
                 <Image 
-                  src="/logo_32x32.png" 
+                  src="/logo_300x300.png" 
                   alt="Jarvis Staking Logo" 
-                  width={32} 
-                  height={32} 
-                  className="h-8 w-8"
+                  width={48} 
+                  height={48} 
+                  className="h-12 w-12"
                   unoptimized={process.env.NODE_ENV === 'development'}
                 />
                 <span className="text-xl font-bold text-white">Jarvis Staking</span>

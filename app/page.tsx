@@ -44,11 +44,11 @@ export default function HomePage() {
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Image 
-              src="/logo_32x32.png" 
+              src="/logo_300x300.png" 
               alt="Jarvis Staking Logo" 
-              width={32} 
-              height={32} 
-              className="w-8 h-8"
+              width={64} 
+              height={64} 
+              className="w-16 h-16"
               priority
               unoptimized={process.env.NODE_ENV === 'development'}
             />

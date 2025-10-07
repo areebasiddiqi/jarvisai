@@ -1,67 +1,49 @@
 # Profit Distribution System
 
 ## Overview
-The Jarvis Staking platform includes an automated profit distribution system that distributes hourly profits to users based on their active investment plans.
+The Jarvis Staking platform includes a profit distribution system that distributes daily profits to users 24 hours after they invest in a plan.
 
 ## How It Works
 
 ### Profit Calculation
 - **Daily Rate**: Each investment plan has a daily percentage (Plan A: 2%, Plan B: 4%, Plan C: 5%)
-- **Hourly Rate**: Daily rate divided by 24 hours
-- **Profit Amount**: `Investment Amount × (Daily Percentage / 100) / 24`
+- **Profit Amount**: `Investment Amount × (Daily Percentage / 100)`
+- **24-Hour Rule**: Users receive their first profit 24 hours after investing
 
 ### Distribution Process
 1. **Fetches Active Plans**: Gets all active investment plans from the database
-2. **Calculates Profits**: Computes hourly profit for each plan
-3. **Updates Balances**: Adds profits to users' main wallet balances
-4. **Creates Transactions**: Records profit transactions for audit trail
-5. **Updates Plan Totals**: Tracks total profits earned per investment plan
+2. **Checks Eligibility**: Only processes plans that are at least 24 hours old
+3. **Calculates Profits**: Computes daily profit for each eligible plan
+4. **Updates Balances**: Adds profits to users' main wallet balances
+5. **Creates Transactions**: Records profit transactions for audit trail
+6. **Updates Plan Totals**: Tracks total profits earned per investment plan
 
-## Current Status ⚠️
+## Current Status ✅
 
 ### ✅ What's Working:
 - Profit distribution logic is implemented
+- 24-hour waiting period enforced per investment plan
 - Database tables are created (`profit_distributions`)
 - Manual trigger via admin dashboard
 - API endpoints for profit distribution
+- On-demand profit distribution (no automated scheduling)
 
-### ❌ What's Missing:
-- **Automated hourly execution** - The system is not currently running automatically
+## Manual Profit Distribution
 
-## Setting Up Automated Distribution
+The system now operates on-demand rather than automated scheduling. Profits are distributed when:
 
-### Option 1: External Cron Service (Recommended)
-Use a service like **cron-job.org** or **EasyCron** to call the API endpoint every hour:
+1. **Admin manually triggers** distribution via the admin dashboard
+2. **API calls** are made to the distribution endpoints
+3. **24-hour rule applies**: Only plans created 24+ hours ago will receive profits
 
-**Endpoint**: `https://your-domain.com/api/cron/distribute-profits`
-**Method**: GET or POST
-**Headers**: `Authorization: Bearer YOUR_CRON_SECRET`
-**Schedule**: Every hour (0 * * * *)
+### Triggering Distribution
+- **Admin Dashboard**: Login as admin → Go to `/admin` → Click "Distribute Profits"
+- **API Endpoint**: `POST /api/admin/distribute-profits` (requires admin auth)
 
-### Option 2: Server-Side Cron (Linux/Unix)
-Add to your server's crontab:
-```bash
-0 * * * * curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/cron/distribute-profits
-```
-
-### Option 3: Vercel Cron Jobs
-If deployed on Vercel, add to `vercel.json`:
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/distribute-profits",
-      "schedule": "0 * * * *"
-    }
-  ]
-}
-```
-
-## Environment Variables
-Add to your `.env` file:
-```
-CRON_SECRET=your-secure-cron-secret-here
-```
+## No Automated Scheduling
+- **Removed**: Cronjob configuration and automated intervals
+- **Benefit**: More control over when profits are distributed
+- **24-Hour Safety**: Users cannot receive profits until 24 hours after investing
 
 ## Manual Testing
 
@@ -125,10 +107,10 @@ curl -X POST https://your-domain.com/api/admin/distribute-profits \
 
 ## Next Steps
 
-To fully activate the system:
-1. Set up external cron service or server cron job
-2. Add CRON_SECRET to environment variables
-3. Test the automated distribution
-4. Monitor logs and user balances
+The system is now ready to use:
+1. **Users invest** in plans and wait 24 hours
+2. **Admin triggers** profit distribution when needed
+3. **Monitor** logs and user balances via admin dashboard
+4. **24-hour rule** ensures fair profit distribution timing
 
-The system is ready to distribute profits every hour once the automated trigger is configured! 🚀
+The system now distributes profits on-demand with a 24-hour waiting period per investment plan! 🚀

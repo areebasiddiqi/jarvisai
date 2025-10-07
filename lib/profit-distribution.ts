@@ -49,6 +49,16 @@ async function distributeInvestmentProfits() {
     const userUpdates = new Map()
 
     for (const plan of plans) {
+      // Check if 24 hours have passed since plan creation
+      const planCreatedAt = new Date(plan.created_at)
+      const now = new Date()
+      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60 * 60)
+      
+      if (hoursSinceCreation < 24) {
+        console.log(`Plan ${plan.id} created ${hoursSinceCreation.toFixed(2)} hours ago, needs to wait 24 hours`)
+        continue
+      }
+
       // Check if profit already distributed today
       const { data: existingDistribution } = await supabaseAdmin
         .from('profit_distributions')
@@ -219,6 +229,16 @@ async function distributeJrcStakingProfits() {
     const stakingUserUpdates = new Map()
 
     for (const plan of stakingPlans) {
+      // Check if 24 hours have passed since staking plan creation
+      const planCreatedAt = new Date(plan.created_at)
+      const now = new Date()
+      const hoursSinceCreation = (now.getTime() - planCreatedAt.getTime()) / (1000 * 60 * 60)
+      
+      if (hoursSinceCreation < 24) {
+        console.log(`Staking plan ${plan.id} created ${hoursSinceCreation.toFixed(2)} hours ago, needs to wait 24 hours`)
+        continue
+      }
+
       // Check if profit already distributed today
       const { data: existingDistribution } = await supabaseAdmin
         .from('jrc_staking_distributions')
@@ -351,17 +371,11 @@ async function distributeJrcStakingProfits() {
   }
 }
 
-// Function to run profit distribution daily
+// Function to run profit distribution on-demand (no longer automated)
+// This function is kept for backward compatibility but no longer sets up intervals
 export function startProfitDistribution() {
-  console.log('Starting automated daily profit distribution system...')
-  
-  // Run immediately
-  distributeProfits()
-  
-  // Then run every 24 hours (daily)
-  setInterval(() => {
-    distributeProfits()
-  }, 24 * 60 * 60 * 1000) // 24 hours in milliseconds
+  console.log('Profit distribution is now on-demand only. Use admin panel or API to trigger.')
+  console.log('Users will receive profits 24 hours after investing in a plan.')
 }
 
 // Manual trigger function for testing
