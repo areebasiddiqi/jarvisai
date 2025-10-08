@@ -53,7 +53,6 @@ export default function HomePage() {
               priority
               unoptimized={process.env.NODE_ENV === 'development'}
             />
-            <span className="text-2xl font-bold text-white">Jarvis Staking</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link 

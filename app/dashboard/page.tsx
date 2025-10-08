@@ -308,6 +308,8 @@ export default function DashboardPage() {
                 priority
                 unoptimized={process.env.NODE_ENV === 'development'}
               />
+              <span className="text-lg sm:text-2xl font-bold text-white">Jarvis Staking</span>
+            </div>
             <div className="flex items-center">
               <Image 
                 src="/logo_300x300.png" 
